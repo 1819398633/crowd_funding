@@ -1,0 +1,71 @@
+```{r}
+library(tidyverse)
+library(dplyr)
+library(ggplot2)
+library(readr)
+library(redav)
+```
+
+```{r}
+raw_df = read_tsv('18k_Projects.csv')
+raw_df %>% head()
+```
+
+```{r}
+# don't need:
+# c(-Url, -`Start Timestamp (UTC)`, -`End Timestamp (UTC)`, -`Creator Bio`, -`Creator Website`)
+# keep creator info for missing value analysis
+raw_df = raw_df %>% select(c(-Url, -`Start Timestamp (UTC)`, -`End Timestamp (UTC)`))
+raw_df %>% names()
+```
+
+Number of NAs in each columns
+
+```{r}
+col_na = colSums(is.na(raw_df)) %>%
+  sort(decreasing = TRUE)
+col_na = col_na[col_na > 0]
+col_na
+```
+
+Spatial information loss is the most frequent. Also the Facebook information, the Creator's number of projects backed. Same for `#Videos` and \`#Words (Risks and Challenges)\`.
+
+Heat maps:
+
+```{r, fig.width=10}
+raw_df_miss = raw_df %>% 
+  select (col_na %>% names())
+names(raw_df_miss) = raw_df_miss %>% names() %>% substr(1,8)
+
+raw_df_miss %>% names()
+
+
+
+raw_df_miss %>% 
+  plot_missing(percent = TRUE)
+```
+
+Missing Patterns:
+
+```{r}
+raw_df %>% filter(is.na(`Creator - # Projects Backed`))
+raw_df %>% filter(!is.na(`Facebook Friends`))
+```
+
+Guessing:
+
+1.  creator project backed & date & project created
+
+2.  note: has video means on the front page. \# video means inside the explanation text.
+
+3.  facebook connected & facebook Friends: If no Facebook connected for the creator, then no information about their Facebook friends.
+
+    ```{r}
+    raw_df %>% filter(`Facebook Connected` == 'Yes' & is.na(`Facebook Friends`))
+    raw_df %>% filter(`Facebook Connected` == 'No' & (!is.na(`Facebook Friends`)))
+    # all return 0 lines
+    ```
+
+4.  #word/#video/creator website: 2014.1\~2014.3, maybe manually problem.
+
+5.  issue: long/altti similar to location: redundancy
