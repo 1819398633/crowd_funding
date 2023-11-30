@@ -6,11 +6,11 @@ execute:
   echo: true
 
 book:
-  title: "YOUR PROJECT TITLE"
+  title: "Crowdfunding Analysis Project"
   author:
-    - AUTHOR1 (UNI1)
-    - AUTHOR2 (UNI2)
-  repo-url: https://github.com/YOUR_GITHUB_ACCOUNT/REPO_NAME
+    - Yilan Chen (yc4355)
+    - Orianne Luo (ol2216)
+  repo-url: https://github.com/1819398633/crowd_funding.git
   date: today
   page-footer:
     right: |
