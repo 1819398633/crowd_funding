@@ -36,11 +36,11 @@ Tip: From the file pane in RStudio, open `README.md`, which contains these instr
 
 ### Render the book (RStudio)
 
--   [ ] 1. If you haven't already, click "Help" "Check for Updates" to make sure you have the latest version of RStudio (and thus have Quarto installed.)
+-   [x] 1. If you haven't already, click "Help" "Check for Updates" to make sure you have the latest version of RStudio (and thus have Quarto installed.)
 
--   [ ] 2. Render the web site locally by clicking the "Build" tap on the right and then "Render Book".
+-   [x] 2. Render the web site locally by clicking the "Build" tap on the right and then "Render Book".
 
--   [ ] 3. Use `browseURL("docs/index.html")` to view your book locally (or just open `docs/index.html` in a browser).
+-   [x] 3. Use `browseURL("docs/index.html")` to view your book locally (or just open `docs/index.html` in a browser).
 
 -   [ ] 4. If it looks good, commit and push all changed files to GitHub.
 
