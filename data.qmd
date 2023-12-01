@@ -2,6 +2,8 @@
 
 Our main data source will be six months of data about Kickstarter crowdfunding projects, from December 15, 2013 to to June 15, 2014, collected using kickspy by Professor Chandan Reddy. The dataset is available on this website: http://dmkd.cs.vt.edu/projects/crowdfunding/dataset.htm, and we will be using the 18k_Projects.csv file. The dataset was used in research papers, including https://creddy.net/papers/WSDM16b.pdf. Projects that were canceled, suspended, or had less than one backer and \$100 as pledged amount were excluded from this dataset. Thus, we will not be able to gain any insights on these types of crowdfunding projects. Data was also collected from social media sites by Professor Reddy's research group, where it was available. Here, the main issue is that there may not be data values available for some of the projects, if they were not shared on social media.
 
+Another issue that we found with the data was that there were some duplicate rows, resulting in multiple instances of a project ID, even though the IDs were supposed to be distinct. It seems like this was a mistake made while collecting the data. There were 69 project IDs that were repeated, so as a data preprocessing step, we will have to go through and remove these duplicate values. Some of these duplicate rows also have slightly different values for certain columns, so we will have to manually determine which of the values is correct. 
+
 The data is formatted as a csv file, and it has not been updated since the initial collection. We will download the data locally and read it using R. There are 18,142 rows and 35 columns in the dataset. It contains information about the Kickstarter projects, including the ID, name, URL, state (failed or successful), currency in which the donations were raised, the category of the projects, the creator of the project, location, the number of updates, the number of comments on the page, rewards (collected by the backer if the project is successful), the goal (or the target amount of money that the creator hopes to raise), the amount of money pledged, the number of backers, the start and end dates of the project, the duration of the project in days, columns to indicate whether the project has a video, and the longitude and latitude coordinates. Moreover, there is information about the creator, including their social media and bio pages.
 
 ## Description
@@ -35,7 +37,7 @@ col_na = col_na[col_na > 0]
 col_na
 ```
 
-The latitude and longitude have most missing values, following by creator website, Facebook friend number, creator's number of projects backed, number of videos in article and number of words in the "Risk and Challenges" section. It seems the missing value of (`Latitude`, `Longitude`) and (`# Videos`, `# Words (Risks and Challenges`) feature pairs appear at the same time.
+The latitude and longitude have the most missing values, following by the creator website, Facebook friend number, creator's number of projects backed, number of videos on the page, and number of words in the "Risk and Challenges" section. It seems the missing values of (`Latitude`, `Longitude`) and (`# Videos`, `# Words (Risks and Challenges`) feature pairs appear at the same time.
 
 To have a further look, we plot the missing value patterns:
 
@@ -50,13 +52,17 @@ raw_df_miss %>%
 
 For features, there are around 50% of (`Latitude`, `Longitude`) pairs missing. `Creator Website` and `Facebook Connected` are also common missing values.
 
-For data rows, most of them (around 25%) miss the `Facebook Connected` information only. It's reasonable for the missing values of creator's Facebook and creator's website, as they may not exist or are not shown on the crowd funding page.
+For data rows, most of them (around 25%) are missing the `Facebook Connected` information only. This is reasonable for the missing values of the creator's Facebook and creator's website, as they may not exist or are not shown on the crowd funding page.
 
 We also identify several patterns:
 
-First, the graph proves the assumption that (`Latitude`, `Longitude`) and (`# Videos`, `# Words (Risks and Challenges`) missing feature pairs appear at the same time. After a further inspect, we find it highly relevant with \`Location\`: The (`Latitude`, `Longitude`) is usually the same for a location. For spacial analysis purpose, we decide to use \`Location\` only.
+First, the graph shows that (`Latitude`, `Longitude`) and (`# Videos`, `# Words (Risks and Challenges`) missing feature pairs appear at the same time. Upon further inspection, we find that it is very similar to \`Location\`, as the (`Latitude`, `Longitude`) coordinates are usually the same for a location. For spacial analysis purpose, we decided to use \`Location\` only.
 
+<<<<<<< HEAD
 Second, we find that the missing of `# Videos`, `# Words (Risks and Challenges)` will appears together with the missing of \`Creator Website\`, `Latitude`, and `Longitude`. Such cases are rare, and the end time of the projects only appears from January, 2014 to March, 2014. We checked the crowd funding webpages and found the data are accessible. Therefore, manually error or technical issue in data collecting may be the reason.
+=======
+Second, we find that the missing values for `# Videos`, `# Words (Risks and Challenges` tend to appear together with \`Creator Website\`, `Latitude`, and `Longitude`. Such cases are rare and only appear from January, 2014 to March, 2014. We checked the crowdfunding webpages and found the data are accessible. Therefore, manually errors or technical issues in data gathering may be the reason why these values are missing.
+>>>>>>> f5c2de796ac441cb31e98c75ce352818ba16c804
 
 ```{r}
 # get end time range
@@ -75,7 +81,11 @@ raw_df %>%
   
 ```
 
+<<<<<<< HEAD
 Third, `Facebook Friends` is missing if and only if `Facebook Connected` is `False` because the Facebook friend's information of the creator is not accessible if we don't know the creator's Facebook from the webpage.
+=======
+Third, `Facebook Friends` is missing if and only if `Facebook Connected` is `False`, which is reasonable.
+>>>>>>> f5c2de796ac441cb31e98c75ce352818ba16c804
 
 ```{r}
 raw_df %>% filter(`Facebook Connected` == 'Yes' & is.na(`Facebook Friends`))
