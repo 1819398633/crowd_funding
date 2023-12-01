@@ -235,7 +235,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
                            101 </code></pre>
 </div>
 </div>
-<p>The latitude and longitude have the most missing values, following by the creator website, Facebook friend number, creator’s number of projects backed, number of videos on the page, and number of words in the “Risk and Challenges” section. It seems the missing values of (<code>Latitude</code>, <code>Longitude</code>) and (<code># Videos</code>, <code># Words (Risks and Challenges</code>) feature pairs appear at the same time.</p>
+<p>The latitude and longitude columns have the most missing values, followed by the creator website, Facebook friend number, creator’s number of projects backed, the number of videos on the page, and the number of words in the “Risk and Challenges” section. It seems that the missing values of (<code>Latitude</code>, <code>Longitude</code>) and (<code># Videos</code>, <code># Words (Risks and Challenges</code>) feature pairs appear at the same time.</p>
 <p>To have a further look, we plot the missing value patterns:</p>
 <div class="cell">
 <details>
@@ -257,11 +257,11 @@ Adding another scale for y, which will replace the existing scale.</code></pre>
 <p><img src="data_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid" width="768"></p>
 </div>
 </div>
-<p>For features, there are around 50% of (<code>Latitude</code>, <code>Longitude</code>) pairs missing. <code>Creator Website</code> and <code>Facebook Connected</code> are also common missing values.</p>
-<p>For data rows, most of them (around 25%) are missing the <code>Facebook Connected</code> information only. This is reasonable for the missing values of the creator’s Facebook and creator’s website, as they may not exist or are not shown on the crowd funding page.</p>
-<p>We also identify several patterns:</p>
-<p>First, the graph shows that (<code>Latitude</code>, <code>Longitude</code>) and (<code># Videos</code>, <code># Words (Risks and Challenges</code>) missing feature pairs appear at the same time. Upon further inspection, we find that it is very similar to `Location`, as the (<code>Latitude</code>, <code>Longitude</code>) coordinates are usually the same for a location. For spacial analysis purpose, we decided to use `Location` only.</p>
-<p>Second, we find that the missing of <code># Videos</code>, <code># Words (Risks and Challenges)</code> will appears together with the missing of `Creator Website`, <code>Latitude</code>, and <code>Longitude</code>. Such cases are rare, and the end time of the projects only appears from January, 2014 to March, 2014. We checked the crowd funding webpages and found the data are accessible. Therefore, manually error or technical issue in data collecting may be the reason.</p>
+<p>For features, there are around 50% of the (<code>Latitude</code>, <code>Longitude</code>) pairs missing. <code>Creator Website</code> and <code>Facebook Connected</code> are also common missing values.</p>
+<p>For data rows, most of them (around 25%) are missing the <code>Facebook Connected</code> information only. This is reasonable for the missing values of the creator’s Facebook and creator’s website, as they may not exist or are not shown on the crowdfunding page.</p>
+<p>We also identified several patterns:</p>
+<p>First, the graph shows that (<code>Latitude</code>, <code>Longitude</code>) and (<code># Videos</code>, <code># Words (Risks and Challenges</code>) missing feature pairs appear at the same time. Upon further inspection, we find that it is very similar to `Location`, as the (<code>Latitude</code>, <code>Longitude</code>) coordinates are usually the same for a location. For spacial analysis purposes, we decided to use `Location` only.</p>
+<p>Second, we find that the missing values of <code># Videos</code>, <code># Words (Risks and Challenges)</code> appear together with the missing values of `Creator Website`, <code>Latitude</code>, and <code>Longitude</code>. Such cases are rare, and the values are only missing for projects with end times from January 2014 to March 2014. We checked the crowdfunding webpages and found that the data is accessible. Therefore, manually error or technical issue in data collecting may be the reason for these missing values.</p>
 <div class="cell">
 <details>
 <summary>Code</summary>
@@ -296,7 +296,7 @@ Adding another scale for y, which will replace the existing scale.</code></pre>
 2 2014-02-12 2014-03-08</code></pre>
 </div>
 </div>
-<p>Third, <code>Facebook Friends</code> is missing if and only if <code>Facebook Connected</code> is <code>False</code> because the Facebook friend’s information of the creator is not accessible if we don’t know the creator’s Facebook from the webpage.</p>
+<p>Third, <code>Facebook Friends</code> is missing if and only if <code>Facebook Connected</code> is <code>False</code>, because the Facebook friend’s information of the creator is not accessible if we don’t know the creator’s Facebook from the webpage.</p>
 <div class="cell">
 <details>
 <summary>Code</summary>
