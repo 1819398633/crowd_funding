@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Crowfunding Analysis Project - 2&nbsp; Data</title>
+<title>Crowdfunding Analysis Project - 2&nbsp; Data</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -19,6 +19,40 @@ ul.task-list li input[type="checkbox"] {
   width: 0.8em;
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 </style>
 
@@ -89,9 +123,9 @@ ul.task-list li input[type="checkbox"] {
   <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal sidebar-navigation floating overflow-auto">
     <div class="pt-lg-2 mt-2 text-left sidebar-header">
     <div class="sidebar-title mb-0 py-0">
-      <a href="./">Crowfunding Analysis Project</a> 
+      <a href="./">Crowdfunding Analysis Project</a> 
         <div class="sidebar-tools-main">
-    <a href="https://github.com/1819398633/crowd_funding" rel="" title="Source Code" class="quarto-navigation-tool px-1" aria-label="Source Code"><i class="bi bi-github"></i></a>
+    <a href="https://github.com/1819398633/crowd_funding.git" rel="" title="Source Code" class="quarto-navigation-tool px-1" aria-label="Source Code"><i class="bi bi-github"></i></a>
 </div>
     </div>
       </div>
@@ -145,7 +179,7 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#description" id="toc-description" class="nav-link active" data-scroll-target="#description"><span class="header-section-number">2.1</span> Description</a></li>
   <li><a href="#missing-value-analysis" id="toc-missing-value-analysis" class="nav-link" data-scroll-target="#missing-value-analysis"><span class="header-section-number">2.2</span> Missing value analysis</a></li>
   </ul>
-<div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/1819398633/crowd_funding/edit/main/data.qmd" class="toc-action">Edit this page</a></p><p><a href="https://github.com/1819398633/crowd_funding/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
+<div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/1819398633/crowd_funding.git/edit/main/data.qmd" class="toc-action">Edit this page</a></p><p><a href="https://github.com/1819398633/crowd_funding.git/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
@@ -167,11 +201,132 @@ ul.task-list li input[type="checkbox"] {
 
 </header>
 
+<p>Our main data source will be six months of data about Kickstarter crowdfunding projects, from December 15, 2013 to to June 15, 2014, collected using kickspy by Professor Chandan Reddy. The dataset is available on this website: http://dmkd.cs.vt.edu/projects/crowdfunding/dataset.htm, and we will be using the 18k_Projects.csv file. The dataset was used in research papers, including https://creddy.net/papers/WSDM16b.pdf. Projects that were canceled, suspended, or had less than one backer and $100 as pledged amount were excluded from this dataset. Thus, we will not be able to gain any insights on these types of crowdfunding projects. Data was also collected from social media sites by Professor Reddy’s research group, where it was available. Here, the main issue is that there may not be data values available for some of the projects, if they were not shared on social media.</p>
+<p>Another issue that we found with the data was that there were some duplicate rows, resulting in multiple instances of a project ID, even though the IDs were supposed to be distinct. It seems like this was a mistake made while collecting the data. There were 74 project IDs that were repeated, so as a data preprocessing step, we will have to go through and remove these duplicate values. Some of these duplicate rows also have slightly different values for certain columns, so we will have to manually determine which of the values is correct.</p>
+<p>The data is formatted as a csv file separated with tabs, and it has not been updated since the initial collection. We will download the data locally and read it using R. There are 18,142 rows and 35 columns in the dataset. It contains information about the Kickstarter projects, including the ID, name, URL, state (failed or successful), currency in which the donations were raised, the category of the projects, the creator of the project, location, the number of updates, the number of comments on the page, rewards (collected by the backer if the project is successful), the goal (or the target amount of money that the creator hopes to raise), the amount of money pledged, the number of backers, the start and end dates of the project, the duration of the project in days, columns to indicate whether the project has a video, and the longitude and latitude coordinates. Moreover, there is information about the creator, including their social media and bio pages.</p>
 <section id="description" class="level2" data-number="2.1">
 <h2 data-number="2.1" class="anchored" data-anchor-id="description"><span class="header-section-number">2.1</span> Description</h2>
+<p>To understand the different types of projects that are on Kickstarter, we could look at the projects by category, as well as the most common key words in the names of the projects. Whether the project is successful or not is indicated by the State column, so we can facet based on State to determine if there are distinguishing characteristics specific to the projects that are successful. The dataset also provides information about the creator, such as the number of Facebook friends that they have if they’ve connected their Facebook to their page, and the number of Facebook shares for their project. The dataset also contains information about the creator pages, including the number of other projects that the creator has created, as well as the amount of content of these pages (including the number of images and videos, the number of words in the Description and Risks and Challenges sections, and the number of FAQs). These are all numerical quantities, for which we could create data visualizations.</p>
+<p>We can also use the Goal column to visualize the target amount of donations for the projects, as well as the Pledged column to display the amount of money that the backers promise to give (if the project is successful). Since different currencies are used for the projects, we would have to standardize to USD.</p>
+<p>Since we are given the start and end times of the projects, we can plot the number of active projects at a given time. This can be further broken down into the successful and failed projects, to determine if the dates during which the project ran had an effect on whether the project was successful. To get the average amount of money that the project backers promise to donate to a project, we can divide the amount pledged by the number of backers. Faceting on whether the project was successful or not will give us more insight on how the distribution of the average amount backers donated to a project may differ.</p>
 </section>
 <section id="missing-value-analysis" class="level2" data-number="2.2">
 <h2 data-number="2.2" class="anchored" data-anchor-id="missing-value-analysis"><span class="header-section-number">2.2</span> Missing value analysis</h2>
+<p>Import data:</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>raw_df <span class="ot">=</span> <span class="fu">read_tsv</span>(<span class="st">'18k_Projects.csv'</span>, <span class="at">show_col_types =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>raw_df <span class="ot">=</span> raw_df <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="fu">c</span>(<span class="sc">-</span>Url, <span class="sc">-</span><span class="st">`</span><span class="at">Start Timestamp (UTC)</span><span class="st">`</span>, <span class="sc">-</span><span class="st">`</span><span class="at">End Timestamp (UTC)</span><span class="st">`</span>))</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>col_na <span class="ot">=</span> <span class="fu">colSums</span>(<span class="fu">is.na</span>(raw_df)) <span class="sc">%&gt;%</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sort</span>(<span class="at">decreasing =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>col_na <span class="ot">=</span> col_na[col_na <span class="sc">&gt;</span> <span class="dv">0</span>]</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>col_na</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>                      Latitude                      Longitude 
+                          8339                           8339 
+               Creator Website               Facebook Friends 
+                          6667                           5852 
+   Creator - # Projects Backed                       # Videos 
+                          4244                            101 
+# Words (Risks and Challenges) 
+                           101 </code></pre>
+</div>
+</div>
+<p>The latitude and longitude have the most missing values, following by the creator website, Facebook friend number, creator’s number of projects backed, number of videos on the page, and number of words in the “Risk and Challenges” section. It seems the missing values of (<code>Latitude</code>, <code>Longitude</code>) and (<code># Videos</code>, <code># Words (Risks and Challenges</code>) feature pairs appear at the same time.</p>
+<p>To have a further look, we plot the missing value patterns:</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>raw_df_miss <span class="ot">=</span> raw_df <span class="sc">%&gt;%</span> </span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span> (col_na <span class="sc">%&gt;%</span> <span class="fu">names</span>())</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(raw_df_miss) <span class="ot">=</span> <span class="fu">c</span>(<span class="st">'Lat.'</span>, <span class="st">'Long.'</span>, <span class="st">'Cre.Web.'</span>, <span class="st">'FB.Con.'</span>, <span class="st">'Cre.numB'</span>, <span class="st">'num.Video'</span>, <span class="st">'num.WoRC'</span>)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>raw_df_miss <span class="sc">%&gt;%</span> </span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot_missing</span>(<span class="at">percent =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stderr">
+<pre><code>Scale for y is already present.
+Adding another scale for y, which will replace the existing scale.
+Scale for y is already present.
+Adding another scale for y, which will replace the existing scale.</code></pre>
+</div>
+<div class="cell-output-display">
+<p><img src="data_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid" width="768"></p>
+</div>
+</div>
+<p>For features, there are around 50% of (<code>Latitude</code>, <code>Longitude</code>) pairs missing. <code>Creator Website</code> and <code>Facebook Connected</code> are also common missing values.</p>
+<p>For data rows, most of them (around 25%) are missing the <code>Facebook Connected</code> information only. This is reasonable for the missing values of the creator’s Facebook and creator’s website, as they may not exist or are not shown on the crowd funding page.</p>
+<p>We also identify several patterns:</p>
+<p>First, the graph shows that (<code>Latitude</code>, <code>Longitude</code>) and (<code># Videos</code>, <code># Words (Risks and Challenges</code>) missing feature pairs appear at the same time. Upon further inspection, we find that it is very similar to `Location`, as the (<code>Latitude</code>, <code>Longitude</code>) coordinates are usually the same for a location. For spacial analysis purpose, we decided to use `Location` only.</p>
+<p>Second, we find that the missing of <code># Videos</code>, <code># Words (Risks and Challenges)</code> will appears together with the missing of `Creator Website`, <code>Latitude</code>, and <code>Longitude</code>. Such cases are rare, and the end time of the projects only appears from January, 2014 to March, 2014. We checked the crowd funding webpages and found the data are accessible. Therefore, manually error or technical issue in data collecting may be the reason.</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># get end time range</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>raw_df <span class="sc">%&gt;%</span> </span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="st">`</span><span class="at"># Videos</span><span class="st">`</span> <span class="sc">%&gt;%</span> <span class="fu">is.na</span>()) <span class="sc">%&gt;%</span> </span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(Start, End) <span class="sc">%&gt;%</span> </span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(End) <span class="sc">%&gt;%</span> </span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice</span>(<span class="fu">c</span>(<span class="dv">1</span>,<span class="fu">n</span>()))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2 × 2
+  Start      End       
+  &lt;date&gt;     &lt;date&gt;    
+1 2013-12-30 2014-01-14
+2 2014-01-31 2014-03-12</code></pre>
+</div>
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># get start time range</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>raw_df <span class="sc">%&gt;%</span> </span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="st">`</span><span class="at"># Videos</span><span class="st">`</span> <span class="sc">%&gt;%</span> <span class="fu">is.na</span>()) <span class="sc">%&gt;%</span> </span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(Start, End) <span class="sc">%&gt;%</span> </span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(Start) <span class="sc">%&gt;%</span> </span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice</span>(<span class="fu">c</span>(<span class="dv">1</span>,<span class="fu">n</span>()))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2 × 2
+  Start      End       
+  &lt;date&gt;     &lt;date&gt;    
+1 2013-12-16 2014-01-15
+2 2014-02-12 2014-03-08</code></pre>
+</div>
+</div>
+<p>Third, <code>Facebook Friends</code> is missing if and only if <code>Facebook Connected</code> is <code>False</code> because the Facebook friend’s information of the creator is not accessible if we don’t know the creator’s Facebook from the webpage.</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>raw_df <span class="sc">%&gt;%</span> <span class="fu">filter</span>(<span class="st">`</span><span class="at">Facebook Connected</span><span class="st">`</span> <span class="sc">==</span> <span class="st">'Yes'</span> <span class="sc">&amp;</span> <span class="fu">is.na</span>(<span class="st">`</span><span class="at">Facebook Friends</span><span class="st">`</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 0 × 32
+# ℹ 32 variables: Id &lt;dbl&gt;, Name &lt;chr&gt;, State &lt;chr&gt;, Currency &lt;chr&gt;,
+#   Top Category &lt;chr&gt;, Category &lt;chr&gt;, Creator &lt;chr&gt;, Location &lt;chr&gt;,
+#   Updates &lt;dbl&gt;, Comments &lt;dbl&gt;, Rewards &lt;dbl&gt;, Goal &lt;dbl&gt;, Pledged &lt;dbl&gt;,
+#   Backers &lt;dbl&gt;, Start &lt;date&gt;, End &lt;date&gt;, Duration in Days &lt;dbl&gt;,
+#   Facebook Connected &lt;chr&gt;, Facebook Friends &lt;dbl&gt;, Facebook Shares &lt;dbl&gt;,
+#   Has Video &lt;chr&gt;, Latitude &lt;dbl&gt;, Longitude &lt;dbl&gt;, Creator Bio &lt;chr&gt;,
+#   Creator Website &lt;chr&gt;, Creator - # Projects Created &lt;dbl&gt;, …</code></pre>
+</div>
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>raw_df <span class="sc">%&gt;%</span> <span class="fu">filter</span>(<span class="st">`</span><span class="at">Facebook Connected</span><span class="st">`</span> <span class="sc">==</span> <span class="st">'No'</span> <span class="sc">&amp;</span> (<span class="sc">!</span><span class="fu">is.na</span>(<span class="st">`</span><span class="at">Facebook Friends</span><span class="st">`</span>)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 0 × 32
+# ℹ 32 variables: Id &lt;dbl&gt;, Name &lt;chr&gt;, State &lt;chr&gt;, Currency &lt;chr&gt;,
+#   Top Category &lt;chr&gt;, Category &lt;chr&gt;, Creator &lt;chr&gt;, Location &lt;chr&gt;,
+#   Updates &lt;dbl&gt;, Comments &lt;dbl&gt;, Rewards &lt;dbl&gt;, Goal &lt;dbl&gt;, Pledged &lt;dbl&gt;,
+#   Backers &lt;dbl&gt;, Start &lt;date&gt;, End &lt;date&gt;, Duration in Days &lt;dbl&gt;,
+#   Facebook Connected &lt;chr&gt;, Facebook Friends &lt;dbl&gt;, Facebook Shares &lt;dbl&gt;,
+#   Has Video &lt;chr&gt;, Latitude &lt;dbl&gt;, Longitude &lt;dbl&gt;, Creator Bio &lt;chr&gt;,
+#   Creator Website &lt;chr&gt;, Creator - # Projects Created &lt;dbl&gt;, …</code></pre>
+</div>
+</div>
 
 
 </section>
