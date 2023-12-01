@@ -35,7 +35,7 @@ col_na = col_na[col_na > 0]
 col_na
 ```
 
-The latitude and longitude have most missing values, following by creator website, Facebook friend number, creator's number of projects backed, number of videos in article and number of words in the "Risk and Challenges" section. It seems the missing value of (`Latitude`, `Longitude`) and (`# Videos`, `# Words (Risks and Challenges`) feature pairs appear at the same time.
+The latitude and longitude have the most missing values, following by the creator website, Facebook friend number, creator's number of projects backed, number of videos on the page, and number of words in the "Risk and Challenges" section. It seems the missing values of (`Latitude`, `Longitude`) and (`# Videos`, `# Words (Risks and Challenges`) feature pairs appear at the same time.
 
 To have a further look, we plot the missing value patterns:
 
@@ -50,19 +50,19 @@ raw_df_miss %>%
 
 For features, there are around 50% of (`Latitude`, `Longitude`) pairs missing. `Creator Website` and `Facebook Connected` are also common missing values.
 
-For data rows, most of them (around 25%) miss the `Facebook Connected` information only. It's reasonable for the missing values of creator's Facebook and creator's website, as they may not exist or are not shown on the crowd funding page.
+For data rows, most of them (around 25%) are missing the `Facebook Connected` information only. This is reasonable for the missing values of the creator's Facebook and creator's website, as they may not exist or are not shown on the crowd funding page.
 
 We also identify several patterns:
 
-First, the graph proves the assumption that (`Latitude`, `Longitude`) and (`# Videos`, `# Words (Risks and Challenges`) missing feature pairs appear at the same time. After a further inspect, we find it highly relevant with \`Location\`: The (`Latitude`, `Longitude`) is usually the same for a location. For spacial analysis purpose, we decide to use \`Location\` only.
+First, the graph shows that (`Latitude`, `Longitude`) and (`# Videos`, `# Words (Risks and Challenges`) missing feature pairs appear at the same time. Upon further inspection, we find that it is very similar to \`Location\`, as the (`Latitude`, `Longitude`) coordinates are usually the same for a location. For spacial analysis purpose, we decided to use \`Location\` only.
 
-Second, we find that the missing of `# Videos`, `# Words (Risks and Challenges` will appears together with \`Creator Website\`, `Latitude`, and `Longitude`. Such cases are rare, and only appears from January, 2014 to March, 2014. We checked the crowd funding webpages and found the data are accessible. Therefore, manually error or technical issue in data gathering may be the reason.
+Second, we find that the missing values for `# Videos`, `# Words (Risks and Challenges` tend to appear together with \`Creator Website\`, `Latitude`, and `Longitude`. Such cases are rare and only appear from January, 2014 to March, 2014. We checked the crowdfunding webpages and found the data are accessible. Therefore, manually errors or technical issues in data gathering may be the reason why these values are missing.
 
 ```{r}
 #TODO
 ```
 
-Thrid, `Facebook Friends` is missing if and only if `Facebook Connected` is `False`, which is reasonable.
+Third, `Facebook Friends` is missing if and only if `Facebook Connected` is `False`, which is reasonable.
 
 ```{r}
 raw_df %>% filter(`Facebook Connected` == 'Yes' & is.na(`Facebook Friends`))
