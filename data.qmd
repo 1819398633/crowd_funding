@@ -58,11 +58,7 @@ We also identify several patterns:
 
 First, the graph shows that (`Latitude`, `Longitude`) and (`# Videos`, `# Words (Risks and Challenges`) missing feature pairs appear at the same time. Upon further inspection, we find that it is very similar to \`Location\`, as the (`Latitude`, `Longitude`) coordinates are usually the same for a location. For spacial analysis purpose, we decided to use \`Location\` only.
 
-<<<<<<< HEAD
 Second, we find that the missing of `# Videos`, `# Words (Risks and Challenges)` will appears together with the missing of \`Creator Website\`, `Latitude`, and `Longitude`. Such cases are rare, and the end time of the projects only appears from January, 2014 to March, 2014. We checked the crowd funding webpages and found the data are accessible. Therefore, manually error or technical issue in data collecting may be the reason.
-=======
-Second, we find that the missing values for `# Videos`, `# Words (Risks and Challenges` tend to appear together with \`Creator Website\`, `Latitude`, and `Longitude`. Such cases are rare and only appear from January, 2014 to March, 2014. We checked the crowdfunding webpages and found the data are accessible. Therefore, manually errors or technical issues in data gathering may be the reason why these values are missing.
->>>>>>> f5c2de796ac441cb31e98c75ce352818ba16c804
 
 ```{r}
 # get end time range
@@ -81,11 +77,7 @@ raw_df %>%
   
 ```
 
-<<<<<<< HEAD
 Third, `Facebook Friends` is missing if and only if `Facebook Connected` is `False` because the Facebook friend's information of the creator is not accessible if we don't know the creator's Facebook from the webpage.
-=======
-Third, `Facebook Friends` is missing if and only if `Facebook Connected` is `False`, which is reasonable.
->>>>>>> f5c2de796ac441cb31e98c75ce352818ba16c804
 
 ```{r}
 raw_df %>% filter(`Facebook Connected` == 'Yes' & is.na(`Facebook Friends`))
