@@ -56,13 +56,26 @@ We also identify several patterns:
 
 First, the graph proves the assumption that (`Latitude`, `Longitude`) and (`# Videos`, `# Words (Risks and Challenges`) missing feature pairs appear at the same time. After a further inspect, we find it highly relevant with \`Location\`: The (`Latitude`, `Longitude`) is usually the same for a location. For spacial analysis purpose, we decide to use \`Location\` only.
 
-Second, we find that the missing of `# Videos`, `# Words (Risks and Challenges` will appears together with \`Creator Website\`, `Latitude`, and `Longitude`. Such cases are rare, and only appears from January, 2014 to March, 2014. We checked the crowd funding webpages and found the data are accessible. Therefore, manually error or technical issue in data gathering may be the reason.
+Second, we find that the missing of `# Videos`, `# Words (Risks and Challenges)` will appears together with the missing of \`Creator Website\`, `Latitude`, and `Longitude`. Such cases are rare, and the end time of the projects only appears from January, 2014 to March, 2014. We checked the crowd funding webpages and found the data are accessible. Therefore, manually error or technical issue in data collecting may be the reason.
 
 ```{r}
-#TODO
+# get end time range
+raw_df %>% 
+  filter(`# Videos` %>% is.na()) %>% 
+  select(Start, End) %>% 
+  arrange(End) %>% 
+  slice(c(1,n()))
+
+# get start time range
+raw_df %>% 
+  filter(`# Videos` %>% is.na()) %>% 
+  select(Start, End) %>% 
+  arrange(Start) %>% 
+  slice(c(1,n()))
+  
 ```
 
-Thrid, `Facebook Friends` is missing if and only if `Facebook Connected` is `False`, which is reasonable.
+Third, `Facebook Friends` is missing if and only if `Facebook Connected` is `False` because the Facebook friend's information of the creator is not accessible if we don't know the creator's Facebook from the webpage.
 
 ```{r}
 raw_df %>% filter(`Facebook Connected` == 'Yes' & is.na(`Facebook Friends`))

@@ -19,9 +19,19 @@ raw_df = raw_df %>% select(c(-Url, -`Start Timestamp (UTC)`, -`End Timestamp (UT
 raw_df %>% names()
 ```
 
+```{r}
+# duplicate IDs
+
+org_nrow = nrow(raw_df)
+org_nrow
+raw_df = raw_df %>% distinct() %>% distinct(Id, .keep_all=TRUE)
+org_nrow - nrow(raw_df)
+```
+
 Number of NAs in each columns
 
 ```{r}
+is.na(raw_df) %>% sum()
 col_na = colSums(is.na(raw_df)) %>%
   sort(decreasing = TRUE)
 col_na = col_na[col_na > 0]
@@ -69,3 +79,34 @@ Guessing:
 4.  #word/#video/creator website: 2014.1\~2014.3, maybe manually problem.
 
 5.  issue: long/altti similar to location: redundancy
+
+```{r}
+missing_bool <- raw_df %>% 
+    rownames_to_column("Id") %>% 
+    gather(key, value, -id) %>% 
+    mutate(missing = ifelse(is.na(value), "yes", "no"))
+missing_bool
+```
+
+```{r}
+nrow(raw_df)
+```
+
+```{r}
+nrow(raw_df) - length(raw_df$Id %>% unique())
+```
+
+```{r}
+nrow(raw_df) - raw_df %>% unique() %>% nrow()
+```
+
+```{r}
+nrow(raw_df) - raw_df$Name %>% unique() %>% length()
+```
+
+```{r}
+raw_df = raw_df %>% distinct()
+dup_id = raw_df$Id[duplicated(raw_df$Id)]
+dup_id %>% length()
+raw_df %>% filter(Id %in% dup_id) %>% arrange(Id)
+```
