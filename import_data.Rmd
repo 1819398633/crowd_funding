@@ -48,6 +48,20 @@ nrow(raw_df) - nrow(clean_df)
 
 ```
 
+Convert data type
+
+```{r}
+glimpse(clean_df)
+# already converted
+
+```
+
+Store clean data
+
+```{r}
+write_csv(clean_df, "18k_Projects_clean.csv")
+```
+
 Number of NAs in each columns
 
 ```{r}
