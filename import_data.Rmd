@@ -19,20 +19,54 @@ raw_df = raw_df %>% select(c(-Url, -`Start Timestamp (UTC)`, -`End Timestamp (UT
 raw_df %>% names()
 ```
 
-```{r}
-# duplicate IDs
+Try1: for duplicate ID, keep those with fewer NAs
 
-org_nrow = nrow(raw_df)
-org_nrow
-raw_df = raw_df %>% distinct() %>% distinct(Id, .keep_all=TRUE)
-org_nrow - nrow(raw_df)
+```{r}
+# delete duplicate rows (5)
+clean_df = raw_df %>% distinct()
+nrow(raw_df) - nrow(clean_df)
+# duplicate ID: 64
+nrow(clean_df) - nrow(clean_df %>% distinct(Id, .keep_all=TRUE))
+
+# get NA number for each row
+clean_df = clean_df %>% 
+  mutate(na_num = rowSums(is.na(.)))
+clean_df %>% select(na_num) %>% table()
+
+# for each ID, select the one with fewer NAs
+clean_df = clean_df %>% 
+  group_by(Id) %>% 
+  slice_min(na_num, n=1)
+nrow(raw_df) - nrow(clean_df) 
+nrow((raw_df)) - nrow(clean_df %>% distinct(Id))
+# still 10 is not eliminate because they have the same missing value number
+# duplicate_rows <- clean_df[duplicated(clean_df$Id), ] %>% pull(Id)
+# clean_df %>% filter(Id %in% duplicate_rows)
+clean_df = clean_df %>% distinct(Id, .keep_all=TRUE) %>% as_tibble()
+nrow(raw_df) - nrow(clean_df) 
+
+
+```
+
+Convert data type
+
+```{r}
+glimpse(clean_df)
+# already converted
+
+```
+
+Store clean data
+
+```{r}
+write_csv(clean_df, "18k_Projects_clean.csv")
 ```
 
 Number of NAs in each columns
 
 ```{r}
-is.na(raw_df) %>% sum()
-col_na = colSums(is.na(raw_df)) %>%
+is.na(clean_df) %>% sum()
+col_na = colSums(is.na(clean_df)) %>%
   sort(decreasing = TRUE)
 col_na = col_na[col_na > 0]
 col_na
@@ -43,19 +77,19 @@ Spatial information loss is the most frequent. Also the Facebook information, th
 Heat maps:
 
 ```{r, fig.width=10}
-raw_df_miss = raw_df %>% 
+clean_df_miss = clean_df %>% 
   select (col_na %>% names())
-names(raw_df_miss) = raw_df_miss %>% names() %>% substr(1,8)
+names(clean_df_miss) = clean_df_miss %>% names() %>% substr(1,8)
 
-raw_df_miss %>% names()
+clean_df_miss %>% names()
 
-
-
-raw_df_miss %>% 
+clean_df_miss %>% 
   plot_missing(percent = TRUE)
 ```
 
-Missing Patterns:
+Around 30% complete cases.
+
+/Missing Patterns:
 
 ```{r}
 raw_df %>% filter(is.na(`Creator - # Projects Backed`))
