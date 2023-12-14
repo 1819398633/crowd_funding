@@ -90,7 +90,7 @@ clean_df <- clean_df %>% mutate(Goal_USD=case_when(Currency=="USD"~Goal,
 clean_df <- clean_df %>% mutate(log_pledged_usd=log(Pledged_USD), log_goal_usd=log(Goal_USD)) 
 ```
 
-Convert locations into spacial coordinates
+We noticed that the spacial coordinates were missing for many of the observations. Thus, we gathered the locations where the coordinate values were not null, and we also used ChatGPT and Google to get the coordinates of locations where no coordinates were provided. We compiled this into the location_coordinates.csv file. To get the spacial coordinates of the locations for data visualizations later, we joined this file with our original dataset and filled in the coordinate values, where available. 
 
 ```{r}
 locations_cleaned <- read.csv("https://raw.githubusercontent.com/1819398633/crowd_funding/master/location_coordinates.csv") 
