@@ -303,7 +303,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>clean_df <span class="ot">&lt;-</span> clean_df <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">log_pledged_usd=</span><span class="fu">log</span>(Pledged_USD), <span class="at">log_goal_usd=</span><span class="fu">log</span>(Goal_USD)) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
-<p>Convert locations into spacial coordinates</p>
+<p>We noticed that the spacial coordinates were missing for many of the observations. Thus, we gathered the locations where the coordinate values were not null, and we also used ChatGPT and Google to get the coordinates of locations where no coordinates were provided. We compiled this into the location_coordinates.csv file. To get the spacial coordinates of the locations for data visualizations later, we joined this file with our original dataset and filled in the coordinate values, where available.</p>
 <div class="cell">
 <details>
 <summary>Code</summary>
