@@ -1,0 +1,161 @@
+Top_Category,category,success_rate,Granularity
+Dance,Dance,0.7110266159695817,Top Category
+Theater,Theater,0.6769706336939721,Top Category
+Music,Music,0.6295888399412628,Top Category
+Comics,Comics,0.5954465849387041,Top Category
+Film & Video,Film & Video,0.5292422932872372,Top Category
+Art,Art,0.5275532696546656,Top Category
+Games,Games,0.49380421313506817,Top Category
+Design,Design,0.45891364902506965,Top Category
+Photography,Photography,0.4070631970260223,Top Category
+Food,Food,0.4050632911392405,Top Category
+Journalism,Journalism,0.4027777777777778,Top Category
+Publishing,Publishing,0.39598629466470875,Top Category
+Crafts,Crafts,0.38009049773755654,Top Category
+Fashion,Fashion,0.35874877810361683,Top Category
+Technology,Technology,0.3570701932858596,Top Category
+Art,Video Art,1,Category
+Art,Illustration,0.6373626373626373,Category
+Art,Public Art,0.6263157894736842,Category
+Art,Installations,0.5714285714285714,Category
+Art,Art,0.5501165501165501,Category
+Art,Sculpture,0.5280898876404494,Category
+Art,Performance Art,0.5038167938931297,Category
+Art,Textiles,0.5,Category
+Art,Painting,0.4695121951219512,Category
+Art,Mixed Media,0.44516129032258067,Category
+Art,Conceptual Art,0.4,Category
+Art,Digital Art,0.35714285714285715,Category
+Art,Ceramics,0,Category
+Comics,Webcomics,0.8888888888888888,Category
+Comics,Anthologies,0.8461538461538461,Category
+Comics,Comic Books,0.6451612903225806,Category
+Comics,Comics,0.6021052631578947,Category
+Comics,Graphic Novels,0.3939393939393939,Category
+Comics,Events,0.2,Category
+Crafts,Knitting,1,Category
+Crafts,Crafts,0.38073394495412843,Category
+Crafts,Candles,0,Category
+Dance,Spaces,0.75,Category
+Dance,Dance,0.7155963302752294,Category
+Dance,Performances,0.6923076923076923,Category
+Dance,Residencies,0.6666666666666666,Category
+Dance,Workshops,0.5,Category
+Design,Architecture,0.625,Category
+Design,Interactive Design,0.6,Category
+Design,Graphic Design,0.5076923076923077,Category
+Design,Design,0.5067873303167421,Category
+Design,Typography,0.5,Category
+Design,Product Design,0.4400377714825307,Category
+Design,Civic Design,0.3333333333333333,Category
+Fashion,Pet Fashion,1,Category
+Fashion,Childrenswear,0.5555555555555556,Category
+Fashion,Footwear,0.5,Category
+Fashion,Couture,0.42857142857142855,Category
+Fashion,Jewelry,0.375,Category
+Fashion,Apparel,0.37254901960784315,Category
+Fashion,Fashion,0.35714285714285715,Category
+Fashion,Ready-to-wear,0.3333333333333333,Category
+Fashion,Accessories,0.21428571428571427,Category
+Film & Video,Short Film,0.7330097087378641,Category
+Film & Video,Fantasy,0.7142857142857143,Category
+Film & Video,Shorts,0.6606606606606606,Category
+Film & Video,Festivals,0.6285714285714286,Category
+Film & Video,Family,0.6,Category
+Film & Video,Comedy,0.5581395348837209,Category
+Film & Video,Documentary,0.5249406175771971,Category
+Film & Video,Experimental,0.52,Category
+Film & Video,Romance,0.5,Category
+Film & Video,Thrillers,0.5,Category
+Film & Video,Narrative Film,0.4871060171919771,Category
+Film & Video,Animation,0.4322033898305085,Category
+Film & Video,Drama,0.42857142857142855,Category
+Film & Video,Webseries,0.4241486068111455,Category
+Film & Video,Science Fiction,0.4117647058823529,Category
+Film & Video,Film & Video,0.38639876352395675,Category
+Film & Video,Music Videos,0.36363636363636365,Category
+Film & Video,Television,0.3333333333333333,Category
+Film & Video,Horror,0.32,Category
+Film & Video,Action,0.25,Category
+Film & Video,Movie Theaters,0,Category
+Food,Community Gardens,0.6666666666666666,Category
+Food,Cookbooks,0.6666666666666666,Category
+Food,Drinks,0.5517241379310345,Category
+Food,Small Batch,0.5454545454545454,Category
+Food,Farms,0.5,Category
+Food,Restaurants,0.5,Category
+Food,Food Trucks,0.4166666666666667,Category
+Food,Food,0.3909378292939937,Category
+Food,Bacon,0.25,Category
+Food,Vegan,0.25,Category
+Food,Farmer's Markets,0.2222222222222222,Category
+Games,Puzzles,0.75,Category
+Games,Playing Cards,0.7428571428571429,Category
+Games,Live Games,0.7272727272727273,Category
+Games,Tabletop Games,0.6997422680412371,Category
+Games,Video Games,0.275,Category
+Games,Games,0.2653061224489796,Category
+Games,Mobile Games,0.08,Category
+Games,Gaming Hardware,0,Category
+Journalism,Print,1,Category
+Journalism,Journalism,0.4,Category
+Journalism,Audio,0,Category
+Music,Chiptune,1,Category
+Music,Punk,0.875,Category
+Music,Indie Rock,0.751937984496124,Category
+Music,Classical Music,0.7159090909090909,Category
+Music,Country & Folk,0.7159090909090909,Category
+Music,Jazz,0.6981132075471698,Category
+Music,Rock,0.6728971962616822,Category
+Music,Kids,0.6666666666666666,Category
+Music,Music,0.635593220338983,Category
+Music,World Music,0.6292134831460674,Category
+Music,Faith,0.6111111111111112,Category
+Music,Pop,0.5721649484536082,Category
+Music,Electronic Music,0.5,Category
+Music,Metal,0.48,Category
+Music,Blues,0.42857142857142855,Category
+Music,R&B,0.25,Category
+Music,Hip-Hop,0.2348993288590604,Category
+Music,Latin,0,Category
+Photography,Fine Art,0.5789473684210527,Category
+Photography,Nature,0.5384615384615384,Category
+Photography,Photobooks,0.5172413793103449,Category
+Photography,Animals,0.5,Category
+Photography,Photography,0.40045766590389015,Category
+Photography,People,0.2916666666666667,Category
+Photography,Places,0.1,Category
+Publishing,Zines,0.8,Category
+Publishing,Literary Journals,0.75,Category
+Publishing,Art Book,0.5844155844155844,Category
+Publishing,Periodical,0.5526315789473685,Category
+Publishing,Academic,0.5,Category
+Publishing,Poetry,0.48,Category
+Publishing,Children's Book,0.43686868686868685,Category
+Publishing,Radio & Podcast,0.40476190476190477,Category
+Publishing,Publishing,0.38934426229508196,Category
+Publishing,Fiction,0.3314393939393939,Category
+Publishing,Nonfiction,0.3296943231441048,Category
+Publishing,Young Adult,0.25,Category
+Publishing,Calendars,0,Category
+Publishing,Translations,0,Category
+Technology,Fabrication Tools,1,Category
+Technology,Space Exploration,1,Category
+Technology,DIY Electronics,0.75,Category
+Technology,Camera Equipment,0.6666666666666666,Category
+Technology,Robots,0.6153846153846154,Category
+Technology,3D Printing,0.6,Category
+Technology,Wearables,0.5714285714285714,Category
+Technology,Hardware,0.44135802469135804,Category
+Technology,Gadgets,0.4375,Category
+Technology,Technology,0.3289817232375979,Category
+Technology,Flight,0.2857142857142857,Category
+Technology,Software,0.24615384615384617,Category
+Technology,Web,0.2,Category
+Technology,Apps,0.1724137931034483,Category
+Technology,Open Software,0.1625,Category
+Technology,Sound,0,Category
+Theater,Immersive,0.75,Category
+Theater,Musical,0.6842105263157895,Category
+Theater,Theater,0.6785714285714286,Category
+Theater,Plays,0.6341463414634146,Category
