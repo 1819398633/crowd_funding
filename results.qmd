@@ -1,1 +1,219 @@
 # Results
+
+We use the stored processed data for the plots below. For data pre-processing details, please refer to the `Data` section.
+
+## Summary
+
+TODO (non-tech summary on top findings)
+
+## Import clean data
+
+```{r, echo=FALSE}
+#| echo: false
+knitr::opts_chunk$set(warning = FALSE, message = FALSE)
+suppressWarnings({
+  
+  library(forcats)
+  library(tidyverse)
+  library(dplyr)
+  library(ggplot2)
+  library(readr)
+  library(stringr)
+  library(redav)
+  library(ggplot2)
+  library(egg)
+  library(vcd)
+  library(RColorBrewer)
+  library(plotly)
+  library(GGally)
+  library(scales)
+  
+}
+  
+)
+
+proj <- read_csv("https://raw.githubusercontent.com/1819398633/crowd_funding/master/18k_Projects_clean.csv", show_col_types = FALSE)
+
+state_color <- hue_pal()(2)
+```
+
+## What currency?
+
+```{r}
+#| warning: false
+ggplot(proj, aes(x=fct_infreq(Currency)))+
+  geom_bar(stat="count") + theme_minimal() + 
+  labs(title="Currency Used Bar Chart") + xlab("Project Currency")
+```
+
+For this dataset, the numerical quantities that we are most interested in are Goal (the amount that the creator aims to raise for their project) and Pledged (the amount that the supporters promise to donate to the project if it is successful). These two variables determine the success of the project, as the project is successful if the amount pledged is greater than or equal to the goal amount; otherwise, the project has failed. However, to ensure the validity of our comparisons across projects, we must be careful with the units. Thus, we start by creating a bar chart of the project currencies. A total of six different currencies were used among the 18,000 projects: USD, GBP, CAD, AUD, NZD, and EUR. The currency for most of the projects is USD, so we will be converting Goal and Projected to USD, to make comparisons across the projects.
+
+## How much of the goals?
+
+```{r}
+#| warning: false
+p1<-ggplot(proj, aes(x=(Goal_USD)))+ geom_histogram() + facet_grid(cols=vars(State)) +scale_x_log10() + theme_minimal() + labs(title="Histogram and Boxplot of Project Goal (USD)") + xlab("")
+
+p2<-ggplot(proj, aes(x=Goal_USD)) + geom_boxplot() + facet_grid(cols=vars(State)) +scale_x_log10() + theme_minimal() + xlab("Project Goal (USD)")
+
+egg::ggarrange(p1, p2, heights=2:1)
+```
+
+To take a closer look at the distribution of the project goal, we created a histogram and boxplot. The histogram is better at showing the overall distribution, while the boxplot highlights the outliers. We also faceted on the state of the project, to see if there are any significant differences for the project goal among the projects that failed and the projects that were successful. The distribution for the project goal is skewed right for both the successful and the failed projects. There are a few very large outlier values, as we can see in the plot above of the log of the project goal amount, though most of the values are clustered near the lower end. The goal of failed projects tends to be slightly higher than the goal of successful projects, though the distributions are pretty similar. We can see that the extreme outliers are among the projects that failed. 
+
+## Pledged amount vs. Goal
+
+```{r}
+#| warning: false
+g <- ggplot(proj, aes(x = Goal_USD, y=Pledged_USD, label = Name, color=State)) +
+  geom_point(size = 0.5, alpha = .8) +
+  scale_x_log10() + scale_y_log10() + theme_minimal() +
+  labs(title="Project Goal vs. Amount Pledged Scatterplot") + xlab("Project Goal") +
+  ylab("Amount Pledged") 
+
+ggplotly(g)
+```
+
+To compare the project goals to the amount pledged, we plotted these two variables on a scatterplot. We can see that there are rounding patterns in the project goals, as there are gaps in the data, suggesting that people tend to round when stating the goal of their project. Most of the project goal amounts lie within 100,000 USD. Once again, we can see outlier values, particularly among the failed projects, where the creator may have been overly ambitious. We can also see that there is some positive correlation between the amount pledged and the goal for the successful projects, though there is not much correlation between these two values for the projects that were unsuccessful. This indicates that, even for successful projects, the amount pledged usually does not drastically exceed the project goal. We can thus infer that the behavior of the backers is influenced by the progress bar of the projects, or the amount remaining for a project to reach its goal. There is also a quite large range of goal values and pledged values for failed projects; some of the failed projects did not receive any amount of money pledged at all, while some of them were very close to reaching their goal and being successful.
+
+## Which top categories have a higher success rate?
+
+```{r}
+#| warning: false
+proj %>% 
+  ggplot(aes(x = fct_reorder(Top_Category, -ifelse(State == 'successful', 1,0), mean), fill = State))+
+  geom_bar(position = 'fill') +
+  labs(title = 'Top Category vs. Rate of success') +
+  xlab('ratio') +
+  ylab('Top Category') +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+After looking at the most common categories, we were curious about which categories had the highest proportion of successful projects. Using a stacked bar chart to compare the proportion of successful projects, we found that categories for entertainment like dance, theater, music, comics had the highest proportion of successful projects.
+
+## Do the most popular projects categories also have the highest success rate?
+
+```{r, fig.height=8, fig.width=8}
+#| warning: false
+
+mosaic(State~fct_infreq(Top_Category), proj, direction=c('v', 'h'), highlighting_fill = state_color, 
+       main = "Top Category vs. Rate of success",
+       title_margins = 4,
+       labeling_args = list(
+  set_varnames = list(`fct_infreq(Top_Category)` = "Top Categories", State = "State"),
+  rot_labels = c(45, 90),
+  gp_labels = gpar(fontsize = 10),
+  offset_labels = c(1,0),
+  offset_varnames = c(1.5,0)))
+
+```
+
+From here, we were curious about whether the most popular project categories for creators were also the most popular categories for the supporters. To do this, we used a mosaic plot to display the relative sizes of each category, as well as the proportion of successful projects in each category. The most common categories are Film & Video, Music, and Publishing, while the least common categories are Crafts and Journalism. The top 3 most popular categories are quite different from each other. Nonetheless, some of the common features that they share are art, entertainment, and digital. For the most part, we found that the most common project categories did not have the highest proportion of successful projects, except for the Music category. On the contrary, several of the least popular categories have the highest success rate.
+
+## What categorical features are relevant with the success?
+
+```{r}
+#| warning: false
+proj_rename <- proj %>% rename(
+  Has_Video = `Has Video`,
+  Facebook_Connected = `Facebook Connected`
+)
+vcd::mosaic(State~Has_Video + Facebook_Connected, 
+            data=proj_rename, 
+            direction=c("v", "v", "h"), 
+            highlighting_fill = state_color,
+            labeling_args = list(
+              set_varnames = list(
+                Has_Video = "Has Video", 
+                Facebook_Connected = "Facebook Connected", 
+                State="State"))) 
+
+```
+
+There does not seem to be much of a relationship between whether or not the project is Facebook connected and whether or not it was successful. However, projects with a video tend to be more successful than projects without a video.
+
+## Where are the projects?
+
+```{r}
+#| warning: false
+proj_map <- proj %>% filter(!is.na(Latitude)) %>% mutate(lat=round(Latitude), long=round(Longitude)) %>% 
+  group_by(lat, long) %>% count()
+
+world_map <- map_data("world")
+ggplot() + geom_polygon(data=world_map, aes(x=long, y=lat, group=group), color="grey", fill="white") + 
+  geom_point(data=proj_map, aes(x=long, y=lat), color = hue_pal()(3)[3], alpha=0.7, size=0.9)
+  # geom_point(data=proj_map, aes(x=long, y=lat, color=n), alpha=0.3)
+```
+
+Most of the projects appear to be located in the United States, with some projects across Europe, along with clusters of projects in Japan, New Zealand, and the east coast of Australia. There are other projects scattered throughout South America, Africa, and Asia.
+
+## What numerical features are relevant with the success?
+
+```{r}
+#| warning: false
+proj %>% 
+  select(State, Backers, `Facebook Shares`, Rewards, log_goal_usd, log_pledged_usd) %>% 
+  ggpairs(title="Scatterplot Matrix", 
+          columns = 2:6,
+          mapping = aes(color=State),
+          lower = list(continuous = wrap('points', alpha=0.2))
+          ) + theme_minimal()
+  
+
+```
+
+To take a closer look at the numerical variables, we plotted a scatterplot matrix of the number of backers, the number of Facebook shares, the number of rewards, the log of the project goal in USD, and the log of the amount pledged in USD. There doesn't appear to be any correlation between the goal of the project and the amount pledged. This makes sense intuitively, because we would assume that people would pledge money to projects that they are interested in, not necessarily to the projects with the highest goals. There is some positive correlation between the number of rewards and the amount of money pledged, suggesting that the promise of rewards can incentivize backers to pledge more money. This could also be because creators who are more dedicated to their project may be more likely to offer rewards, thus increasing the likelihood of success for the project. There is also a positive correlation between the number of Facebook shares and the amount pledged, suggesting that social media can play a role in the successfulness of the project. Lastly, we can see some positive correlation between the number of backers and the amount of money pledged, which makes sense because we would expect the amount of money pledged to be higher if more people want to support the project.
+
+## Significant numeric features related to success
+
+```{r, fig.height=6, fig.width=6}
+#| warning: false
+p_up <- proj %>% 
+  ggplot(aes(x = State, y = `Updates`, fill = State)) +
+  geom_boxplot(alpha = 0.5, show.legend = FALSE) +
+  scale_y_log10()+ labs(title = "State vs. Crowfunding Data")
+
+p_comm <- proj %>% 
+  ggplot(aes(x = State, y = `Comments`, fill = State)) +
+  geom_boxplot(alpha = 0.5, show.legend = FALSE) +
+  scale_y_log10()
+
+
+p_rew <- proj %>% 
+  ggplot(aes(x = State, y = `Rewards`, fill = State)) +
+  geom_boxplot(alpha = 0.5, show.legend = FALSE) +
+  scale_y_log10()
+
+
+p_fcs <- proj %>% 
+  ggplot(aes(x = State, y = `Facebook Shares`, fill = State)) +
+  geom_boxplot(alpha = 0.5, show.legend = FALSE) +
+  scale_y_log10()
+
+egg::ggarrange(p_up, p_comm, p_rew, p_fcs)
+
+
+```
+
+TODO
+
+## more failure among cases with more than 500 words in risk and challenges section
+
+```{r}
+#| warning: false
+p_wrc <- proj %>% 
+  ggplot(aes(x = State, y = `# Words (Risks and Challenges)`, fill = State)) +
+  geom_boxplot(alpha = 0.5, show.legend = FALSE) +
+  scale_y_log10() +labs(title = "All projects")
+
+p_wrc500 <- proj %>% 
+  filter(`# Words (Risks and Challenges)` >= 500) %>% 
+  ggplot(aes(x = State, y = `# Words (Risks and Challenges)`, fill = State)) +
+  geom_boxplot(alpha = 0.5, show.legend = FALSE) +
+  scale_y_log10() +
+  labs(title = "# Words (R&C) more than 500")
+
+egg::ggarrange(p_wrc, p_wrc500, ncol = 2)
+```
+
+A nonlinear relationship: number of words in risk and challenges: similar median in all samples, more failure among cases more than 500 words.
