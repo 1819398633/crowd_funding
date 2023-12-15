@@ -4,7 +4,7 @@ We use the stored processed data for the plots below. For data pre-processing de
 
 ## Summary
 
-TODO (non-tech summary on top findings)
+We can see that most of the projects are located in the United States, and the currency of most of the projects is similarly also USD. Also, the most common categories for the projects in our dataset were Film & Video, Music, and Publishing. This indicates that most of the projects tend to be creative in nature, as well as artistic and digital. Whether or not the project is connected to Facebook does not appear to have an effect on the success rate of the project. However, with regards to other aspects of the project page, we observe that projects that have a video tend to be more successful, as well as projects with a higher number of updates and Facebook shares. When comparing the amount pledged to the goal for the projects, we found that the amount pledged usually does not drastically exceed the project goal, suggesting that the behavior of the backers is influenced by the goal of the projects. 
 
 ## Import clean data
 
@@ -37,7 +37,7 @@ proj <- read_csv("https://raw.githubusercontent.com/1819398633/crowd_funding/mas
 state_color <- hue_pal()(2)
 ```
 
-## What currency?
+## Which currencies are used in the projects?
 
 ```{r}
 #| warning: false
@@ -48,7 +48,7 @@ ggplot(proj, aes(x=fct_infreq(Currency)))+
 
 For this dataset, the numerical quantities that we are most interested in are Goal (the amount that the creator aims to raise for their project) and Pledged (the amount that the supporters promise to donate to the project if it is successful). These two variables determine the success of the project, as the project is successful if the amount pledged is greater than or equal to the goal amount; otherwise, the project has failed. However, to ensure the validity of our comparisons across projects, we must be careful with the units. Thus, we start by creating a bar chart of the project currencies. A total of six different currencies were used among the 18,000 projects: USD, GBP, CAD, AUD, NZD, and EUR. The currency for most of the projects is USD, so we will be converting Goal and Projected to USD, to make comparisons across the projects.
 
-## How much of the goals?
+## How much are the project goals?
 
 ```{r}
 #| warning: false
@@ -59,7 +59,7 @@ p2<-ggplot(proj, aes(x=Goal_USD)) + geom_boxplot() + facet_grid(cols=vars(State)
 egg::ggarrange(p1, p2, heights=2:1)
 ```
 
-To take a closer look at the distribution of the project goal, we created a histogram and boxplot. The histogram is better at showing the overall distribution, while the boxplot highlights the outliers. We also faceted on the state of the project, to see if there are any significant differences for the project goal among the projects that failed and the projects that were successful. The distribution for the project goal is skewed right for both the successful and the failed projects. There are a few very large outlier values, as we can see in the plot above of the log of the project goal amount, though most of the values are clustered near the lower end. The goal of failed projects tends to be slightly higher than the goal of successful projects, though the distributions are pretty similar. We can see that the extreme outliers are among the projects that failed. 
+To take a closer look at the distribution of the project goal, we created a histogram and boxplot. The histogram is better at showing the overall distribution, while the boxplot highlights the outliers. We also faceted on the state of the project, to see if there are any significant differences for the project goal among the projects that failed and the projects that were successful. The distribution for the project goal is skewed right for both the successful and the failed projects. There are a few very large outlier values, as we can see in the plot above of the log of the project goal amount, though most of the values are clustered near the lower end. The goal of failed projects tends to be slightly higher than the goal of successful projects, though the distributions are pretty similar. We can see that the extreme outliers are mostly among the projects that failed. 
 
 ## Pledged amount vs. Goal
 
@@ -74,7 +74,7 @@ g <- ggplot(proj, aes(x = Goal_USD, y=Pledged_USD, label = Name, color=State)) +
 ggplotly(g)
 ```
 
-To compare the project goals to the amount pledged, we plotted these two variables on a scatterplot. We can see that there are rounding patterns in the project goals, as there are gaps in the data, suggesting that people tend to round when stating the goal of their project. Most of the project goal amounts lie within 100,000 USD. Once again, we can see outlier values, particularly among the failed projects, where the creator may have been overly ambitious. We can also see that there is some positive correlation between the amount pledged and the goal for the successful projects, though there is not much correlation between these two values for the projects that were unsuccessful. This indicates that, even for successful projects, the amount pledged usually does not drastically exceed the project goal. We can thus infer that the behavior of the backers is influenced by the progress bar of the projects, or the amount remaining for a project to reach its goal. There is also a quite large range of goal values and pledged values for failed projects; some of the failed projects did not receive any amount of money pledged at all, while some of them were very close to reaching their goal and being successful.
+To compare the project goals to the amount pledged, we plotted these two variables on a scatterplot. We can see that there are rounding patterns in the project goals, as there are gaps in the data, suggesting that people tend to round when stating the goal of their project. Most of the project goal amounts lie within 100,000 USD. Once again, we can see outlier values, particularly among the failed projects, where the creator may have been overly ambitious. We can also see that there is some positive correlation between the amount pledged and the goal for the successful projects, though there is not much correlation between these two values for the projects that were unsuccessful. This indicates that, even for successful projects, the amount pledged usually does not drastically exceed the project goal. We can thus infer that the behavior of the backers is influenced by the progress bar of the projects, or the amount remaining for a project to reach its goal. There is also a quite large range of goal values and pledged values for failed projects; some of the failed projects did not receive any amount of money pledged at all, while some of them were very close to reaching their goal and being successful. We can also note that there were some successful projects that had high goals which were met and exceeded, such as Pono Music - Where Your Soul Rediscovers Music (total of 6224955 USD raised with a goal of only 800000 USD) and Blue Mountain State: The Movie (total of 1911827 USD raised with a goal of 1500000 USD). 
 
 ## Which top categories have a higher success rate?
 
@@ -108,9 +108,9 @@ mosaic(State~fct_infreq(Top_Category), proj, direction=c('v', 'h'), highlighting
 
 ```
 
-From here, we were curious about whether the most popular project categories for creators were also the most popular categories for the supporters. To do this, we used a mosaic plot to display the relative sizes of each category, as well as the proportion of successful projects in each category. The most common categories are Film & Video, Music, and Publishing, while the least common categories are Crafts and Journalism. The top 3 most popular categories are quite different from each other. Nonetheless, some of the common features that they share are art, entertainment, and digital. For the most part, we found that the most common project categories did not have the highest proportion of successful projects, except for the Music category. On the contrary, several of the least popular categories have the highest success rate.
+From here, we were curious about whether the most popular project categories for creators were also the most popular categories for the supporters. To do this, we used a mosaic plot to display the relative sizes of each category, as well as the proportion of successful projects in each category. The most common categories are Film & Video, Music, and Publishing, while the least common categories are Crafts and Journalism. The top 3 most popular categories are quite different from each other. Nonetheless, some of the common features that they share are art, entertainment, and digitalization. For the most part, we found that the most common project categories did not have the highest proportion of successful projects, except for the Music category. On the contrary, several of the least popular categories, such as Dance and Theater, have the highest success rate.
 
-## What categorical features are relevant with the success?
+## What categorical features are most related to the success of the project?
 
 ```{r}
 #| warning: false
@@ -132,7 +132,7 @@ vcd::mosaic(State~Has_Video + Facebook_Connected,
 
 There does not seem to be much of a relationship between whether or not the project is Facebook connected and whether or not it was successful. However, projects with a video tend to be more successful than projects without a video.
 
-## Where are the projects?
+## Where are the projects located?
 
 ```{r}
 #| warning: false
@@ -147,7 +147,7 @@ ggplot() + geom_polygon(data=world_map, aes(x=long, y=lat, group=group), color="
 
 Most of the projects appear to be located in the United States, with some projects across Europe, along with clusters of projects in Japan, New Zealand, and the east coast of Australia. There are other projects scattered throughout South America, Africa, and Asia.
 
-## What numerical features are relevant with the success?
+## What numerical features are most related to the success of the project?
 
 ```{r}
 #| warning: false
@@ -164,7 +164,7 @@ proj %>%
 
 To take a closer look at the numerical variables, we plotted a scatterplot matrix of the number of backers, the number of Facebook shares, the number of rewards, the log of the project goal in USD, and the log of the amount pledged in USD. There doesn't appear to be any correlation between the goal of the project and the amount pledged. This makes sense intuitively, because we would assume that people would pledge money to projects that they are interested in, not necessarily to the projects with the highest goals. There is some positive correlation between the number of rewards and the amount of money pledged, suggesting that the promise of rewards can incentivize backers to pledge more money. This could also be because creators who are more dedicated to their project may be more likely to offer rewards, thus increasing the likelihood of success for the project. There is also a positive correlation between the number of Facebook shares and the amount pledged, suggesting that social media can play a role in the successfulness of the project. Lastly, we can see some positive correlation between the number of backers and the amount of money pledged, which makes sense because we would expect the amount of money pledged to be higher if more people want to support the project.
 
-## Significant numeric features related to success
+## How do the numerical values of various project page features differ between successful and failed projects?  
 
 ```{r, fig.height=6, fig.width=6}
 #| warning: false
@@ -195,7 +195,7 @@ egg::ggarrange(p_up, p_comm, p_rew, p_fcs)
 
 ```
 
-TODO
+To compare the various numerical values gathered on the project pages for each project, we created box graphs and applied log transformations to account for the large values that were skewing the data. We observe that successful projects tend to have more updates than failed projects. This could be because the creators who are more dedicated to their projects tend to update the project more, and thus the project is more likely to succeed. Alternatively, the creators could also be more incentivized to keep their supporters updated if there are more backers for their project. Similarly, we can see that there tend to be more comments on the successful projects than the failed projects. This is likely because successful projects are more likely to gain people's interest, which in turn leads to more interactions between the backers and creators on Kickstarter in the form of comments. Meanwhile, the number of rewards offered by successful projects appears to be slightly higher than the number of rewards offered by failed projects, though this difference does not seem substantial. On the other hand, the number of Facebook shares appears to be much higher for the successful projects than for the failed projects. This indicates that social media can play an important role in raising awareness about a project. There are some successful projects with fewer than 10 Facebook shares, but as indicated in the boxplot, these are outlier values. 
 
 ## more failure among cases with more than 500 words in risk and challenges section
 
