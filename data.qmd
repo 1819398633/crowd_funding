@@ -92,25 +92,19 @@ clean_df <- clean_df %>% mutate(Goal_USD=case_when(Currency=="USD"~Goal,
 clean_df <- clean_df %>% mutate(log_pledged_usd=log(Pledged_USD), log_goal_usd=log(Goal_USD)) 
 ```
 
-We noticed that the spacial coordinates were missing for many of the observations. Thus, we gathered the locations where the coordinate values were not null, and we also used ChatGPT and Google to get the coordinates of locations where no coordinates were provided. We compiled this into the location_coordinates.csv file. To get the spacial coordinates of the locations for data visualizations later, we joined this file with our original dataset and filled in the coordinate values, where available.
-
-```{r}
-locations_cleaned <- read.csv("https://raw.githubusercontent.com/1819398633/crowd_funding/master/location_coordinates.csv") 
-
-clean_df <- left_join(clean_df, locations_cleaned, by="Location", multiple="first") %>% 
-  mutate(Latitude=ifelse(is.na(Latitude), latitude, Latitude),
-         Longitude=ifelse(is.na(Longitude), longitude, Longitude)) %>% select(-latitude, -longitude)
-
-```
 
 Check for outliers and abnormalities: We checked the goal amount. There is a project with extreme high goal value of 100 million USD, 0 updates and only 1 dollar pledged. This is 10 times larger than the second largest Goal value and clearly an outlier, so we removed it.
 
 ```{r}
 # normal
 clean_df %>% slice_min(n=10, order_by = Goal_USD) %>% pull(Goal_USD)
+
 # outlier exist
 clean_df %>% slice_max(n=10, order_by = Goal_USD) %>% pull(Goal_USD)
-clean_df %>% slice_max(n=1, order_by = Goal_USD)
+
+outlier = clean_df %>% slice_max(n=1, order_by = Goal_USD) %>% select(Name, Goal_USD, Pledged_USD, Backers, Updates, Comments)
+outlier[1,] %>% as.vector()
+
 clean_df = clean_df %>% filter(Goal_USD < 1e7)
 ```
 
@@ -187,10 +181,22 @@ clean_df %>%
 
 ## Store clean data
 
-Rename columns, select necessary columns, and store the clean data for plotting.
+We noticed that the spacial coordinates were missing for many of the observations. Thus, we gathered the locations where the coordinate values were not null, and we also used ChatGPT and Google to get the coordinates of locations where no coordinates were provided. We compiled this into the location_coordinates.csv file. To get the spacial coordinates of the locations for data visualizations later, we joined this file with our original dataset and filled in the coordinate values, where available.
+
+```{r}
+locations_cleaned <- read.csv("https://raw.githubusercontent.com/1819398633/crowd_funding/master/location_coordinates.csv") 
+
+clean_df <- left_join(clean_df, locations_cleaned, by="Location", multiple="first") %>% 
+  mutate(Latitude=ifelse(is.na(Latitude), latitude, Latitude),
+         Longitude=ifelse(is.na(Longitude), longitude, Longitude)) %>% select(-latitude, -longitude)
+
+```
+
+We rename columns, select necessary columns, and store the clean data for plotting.
 
 ```{r}
 clean_df <- clean_df %>% rename(Top_Category = `Top Category`)
+# 
 # clean_df %>%
 #   select(c(-`Creator Bio`,
 #            -`Creator Website`,

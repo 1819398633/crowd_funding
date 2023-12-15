@@ -1,12 +1,14 @@
 # Results
 
-We use the stored processed data for the plots below. For data pre-processing details, please refer to the `Data` section.
-
 ## Summary
 
 TODO (non-tech summary on top findings)
 
 ## Import clean data
+
+
+We use the stored processed data for the plots below. For data pre-processing details, please refer to the `Data` section.
+
 
 ```{r}
 
