@@ -18,20 +18,22 @@
   }
 </style> 
 
+<h>Interactive stacked bar chart of successful vs. failed projects by top categories</h>
+
 <div id="charts" style="padding-left: 30px;">
   <p id="chart" style="background-color: silver; color: white;">
-    Please select the type of chart that you would like to view:</p>
+    Please select the units of the bar height that you would like to view:</p>
 
-  <input type="radio" name="chart_type" value="proportions" checked = True>Proportions</input>
-  <input type="radio" name="chart_type" value="count">Total Count</input>
+  <input type="radio" name="chart_type" value="proportions" checked = True>Proportion</input>
+  <input type="radio" name="chart_type" value="count">Count</input>
   </div>
 
   <div id="orders" style="padding-left: 30px;">
   <p id="order" style="background-color: silver; color: white;">
-    Order by:</p>
+    Please select the order of the bars that you would like to view:</p>
 
-  <input type="radio" name="order" value="success_rate" checked = True>Success Rate</input>
-  <input type="radio" name="order" value="count">Total Count</input>
+  <input type="radio" name="order" value="success_rate" checked = True>By Success Rate</input>
+  <input type="radio" name="order" value="count">By Total Count</input>
 </div>
 
 <div id="plot" style="padding-left: 30px;"></div>
