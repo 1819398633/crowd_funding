@@ -178,8 +178,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul>
   <li><a href="#description" id="toc-description" class="nav-link active" data-scroll-target="#description"><span class="header-section-number">2.1</span> Description</a></li>
   <li><a href="#data-pre-processing" id="toc-data-pre-processing" class="nav-link" data-scroll-target="#data-pre-processing"><span class="header-section-number">2.2</span> Data Pre-processing</a></li>
-  <li><a href="#missing-value-analysis" id="toc-missing-value-analysis" class="nav-link" data-scroll-target="#missing-value-analysis"><span class="header-section-number">2.3</span> Missing value analysis</a></li>
-  <li><a href="#store-clean-data" id="toc-store-clean-data" class="nav-link" data-scroll-target="#store-clean-data"><span class="header-section-number">2.4</span> Store clean data</a></li>
+  <li><a href="#missing-value-analysis" id="toc-missing-value-analysis" class="nav-link" data-scroll-target="#missing-value-analysis"><span class="header-section-number">2.3</span> Missing Value Analysis</a></li>
+  <li><a href="#store-clean-data" id="toc-store-clean-data" class="nav-link" data-scroll-target="#store-clean-data"><span class="header-section-number">2.4</span> Store Clean Data</a></li>
   </ul>
 <div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/1819398633/crowd_funding.git/edit/main/data.qmd" class="toc-action">Edit this page</a></p><p><a href="https://github.com/1819398633/crowd_funding.git/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
     </div>
@@ -203,8 +203,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 </header>
 
-<p>Our main data source will be six months of data about Kickstarter crowdfunding projects, from December 15, 2013 to to June 15, 2014, collected using kickspy by Professor Chandan Reddy. The dataset is available on this website<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>: http://dmkd.cs.vt.edu/projects/crowdfunding/dataset.htm, and we will be using the 18k_Projects.csv file. The dataset was used in research papers, including https://creddy.net/papers/WSDM16b.pdf. Projects that were canceled, suspended, or had less than one backer and $100 as pledged amount were excluded from this dataset. Thus, we will not be able to gain any insights on these types of crowdfunding projects. Data was also collected from social media sites by Professor Reddy’s research group, where it was available. Here, the main issue is that there may not be data values available for some of the projects, if they were not shared on social media.</p>
-<p>Another issue that we found with the data was that there were some duplicate rows, resulting in multiple instances of a project ID, even though the IDs were supposed to be distinct. It seems like this was a mistake made while collecting the data. There were 74 project IDs that were repeated, so as a data preprocessing step, we will have to go through and remove these duplicate values. Some of these duplicate rows also have slightly different values for certain columns, so out of the duplicated rows, we decided to keep the one with the lowest number of missing values.</p>
+<p>Our main data source will be six months of data about Kickstarter crowdfunding projects, from December 15, 2013 to to June 15, 2014, collected using kickspy by Professor Chandan Reddy. The dataset is available on this website<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>, and we will be using the <code>18k_Projects.csv</code> file. The dataset was used in research papers<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a>. Projects that were canceled, suspended, or had less than one backer and $100 as pledged amount were excluded from this dataset. Thus, we will not be able to gain any insights on these types of crowdfunding projects. Data was also collected from social media sites by Professor Reddy’s research group, where it was available. Here, the main issue is that there may not be data values available for some of the projects, if they were not shared on social media.</p>
+<p>Another issue that we found with the data was that there were some duplicate rows, resulting in multiple instances of a project ID, even though the IDs were supposed to be distinct. It seems like this was a mistake made while collecting the data. There were 5 duplicated rows and 64 repeated project IDs, so as a data preprocessing step, we will have to go through and remove these duplicate values. Some of these duplicate rows also have slightly different values for certain columns, so out of the duplicated rows, we decided to keep the one with the lowest number of missing values.</p>
 <p>The data is formatted as a csv file separated with tabs, and it has not been updated since the initial collection. We will download the data locally and read it using R. There are 18,142 rows and 35 columns in the dataset. It contains information about the Kickstarter projects, including the ID, name, URL, state (failed or successful), currency in which the donations were raised, the category of the projects, the creator of the project, location, the number of updates, the number of comments on the page, rewards (collected by the backer if the project is successful), the goal (or the target amount of money that the creator hopes to raise), the amount of money pledged, the number of backers, the start and end dates of the project, the duration of the project in days, columns to indicate whether the project has a video, and the longitude and latitude coordinates. Moreover, there is information about the creator, including their social media and bio pages.</p>
 <section id="description" class="level2" data-number="2.1">
 <h2 data-number="2.1" class="anchored" data-anchor-id="description"><span class="header-section-number">2.1</span> Description</h2>
@@ -357,7 +357,7 @@ $Comments
 </div>
 </section>
 <section id="missing-value-analysis" class="level2" data-number="2.3">
-<h2 data-number="2.3" class="anchored" data-anchor-id="missing-value-analysis"><span class="header-section-number">2.3</span> Missing value analysis</h2>
+<h2 data-number="2.3" class="anchored" data-anchor-id="missing-value-analysis"><span class="header-section-number">2.3</span> Missing Value Analysis</h2>
 <p>For the purpose of the analysis, we use data generated by the code above with ancillary features.</p>
 <p>The table below shows the number of missing values in the columns.</p>
 <div class="cell">
@@ -402,9 +402,9 @@ Adding another scale for y, which will replace the existing scale.</code></pre>
 </div>
 </div>
 <p>For features, there are around 50% of the (<code>Latitude</code>, <code>Longitude</code>) pairs missing. <code>Creator Website</code> and <code>Facebook Connected</code> are also common missing values.</p>
-<p>For data rows, most of them (around 25%) are missing the <code>Facebook Connected</code> information only. This is reasonable for the missing values of the creator’s Facebook and creator’s website, as they may not exist or are not shown on the crowdfunding page.</p>
+<p>For data rows, there are only around 30% complete cases. Most of the incomplete cases (around 12.5% of the total) are missing the <code>Facebook Connected</code> information only. This is reasonable for the missing values of the creator’s Facebook and creator’s website, as they may not exist or are not shown on the crowdfunding page.</p>
 <p>We also identified several patterns:</p>
-<p>First, the graph shows that (<code>Latitude</code>, <code>Longitude</code>) and (<code># Videos</code>, <code># Words (Risks and Challenges</code>) missing feature pairs appear at the same time. Upon further inspection, we find that it is very similar to `Location`, as the (<code>Latitude</code>, <code>Longitude</code>) coordinates are usually the same for a location. For spacial analysis purposes, we decided to use `Location` only.</p>
+<p>First, the graph shows that (<code>Latitude</code>, <code>Longitude</code>) missing feature pairs appear at the same time, while <code># Videos</code>, <code># Words (Risks and Challenges</code>) missing feature pairs also appear at the same time. Upon further inspection, we find that it is very similar to `Location`, as the (<code>Latitude</code>, <code>Longitude</code>) coordinates are usually the same for a location. We imputed them by the location (see “Store Clean Data” section).</p>
 <p>Second, we find that the missing values of <code># Videos</code>, <code># Words (Risks and Challenges)</code> appear together with the missing values of `Creator Website`, <code>Latitude</code>, and <code>Longitude</code>. Such cases are rare, and the values are only missing for projects with end times from January 2014 to March 2014. We checked the crowdfunding webpages and found that the data is accessible. Therefore, manually error or technical issue in data collecting may be the reason for these missing values.</p>
 <p>Here’s the project start and end date ranges.</p>
 <div class="cell">
@@ -451,7 +451,7 @@ Adding another scale for y, which will replace the existing scale.</code></pre>
 </div>
 </section>
 <section id="store-clean-data" class="level2" data-number="2.4">
-<h2 data-number="2.4" class="anchored" data-anchor-id="store-clean-data"><span class="header-section-number">2.4</span> Store clean data</h2>
+<h2 data-number="2.4" class="anchored" data-anchor-id="store-clean-data"><span class="header-section-number">2.4</span> Store Clean Data</h2>
 <p>We noticed that the spacial coordinates were missing for many of the observations. Thus, we gathered the locations where the coordinate values were not null, and we also used ChatGPT and Google to get the coordinates of locations where no coordinates were provided. We compiled this into the location_coordinates.csv file. To get the spacial coordinates of the locations for data visualizations later, we joined this file with our original dataset and filled in the coordinate values, where available.</p>
 <div class="cell">
 <details>
@@ -485,6 +485,7 @@ Adding another scale for y, which will replace the existing scale.</code></pre>
 <hr>
 <ol>
 <li id="fn1"><p>http://dmkd.cs.vt.edu/projects/crowdfunding/dataset.htm<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2"><p>including https://creddy.net/papers/WSDM16b.pdf<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 </ol>
 </section>
 
