@@ -1,0 +1,437 @@
+```{r, include=FALSE, echo=FALSE}
+library(tidyverse)
+library(dplyr)
+library(ggplot2)
+library(readr)
+library(redav)
+library(forcats)
+options(warn = -1)
+```
+
+```{r}
+# import data 
+proj = read_csv('18k_Projects_clean.csv', show_col_types = FALSE)
+```
+
+```{r}
+# columns of interest
+# proj %>% colnames()
+
+proj<-proj %>% mutate(Pledged_USD=case_when(Currency=="USD"~Pledged, 
+                                            Currency=="CAD"~0.74*Pledged, 
+                                            Currency=="AUD"~0.66*Pledged, 
+                                            Currency=="GBP"~1.26*Pledged, 
+                                            Currency=="EUR"~1.08*Pledged, 
+                                            Currency=="NZD"~0.61*Pledged))
+proj<-proj %>% mutate(Goal_USD=case_when(Currency=="USD"~Goal, 
+                                         Currency=="CAD"~0.74*Goal, 
+                                         Currency=="AUD"~0.66*Goal, 
+                                         Currency=="GBP"~1.26*Goal, 
+                                         Currency=="EUR"~1.08*Goal, 
+                                         Currency=="NZD"~0.61*Goal))
+
+
+cat_feat = c(
+  "State",
+"Top Category",      # bar chart              
+ "Category",         # too many
+ "Facebook Connected", 
+ "Has Video",  
+"Has Video"  
+)
+
+num_feat = c(
+  "Updates",
+  "Comments",
+  "Rewards",
+  "Goal"   ,
+  "Pledged",
+  "Backers",
+  "Duration in Days",    
+  "Facebook Friends"              ,
+  "Facebook Shares"               ,
+  "Creator - # Projects Created"  ,
+  "Creator - # Projects Backed"   ,
+  "# Videos"                      ,
+  "# Images"                      ,
+  "# Words (Description)"         ,
+  "# Words (Risks and Challenges)",
+  "# FAQs"      
+)
+c(cat_feat, num_feat)
+```
+
+```{r}
+proj %>% slice_max(n=10, order_by = Goal_USD)
+proj = proj %>% filter(Goal_USD < 1e7)
+```
+
+```{r, fig.height=20, fig.width=20}
+library(GGally)
+# proj %>% select(c(cat_feat, num_feat))
+# proj %>% select(cat_feat) %>% 
+#   select(-Category) %>% 
+#   ggpairs()
+       
+```
+
+```{r, fig.height=20}
+# cleveland dot plot of categories
+proj %>% 
+  ggplot(aes(x=fct_infreq(`Top Category`))) +
+  geom_bar()
+
+proj %>% 
+  group_by(Category) %>% 
+  summarise(Freq = n()) %>% 
+  ggplot(aes(x = Freq, y = fct_reorder(Category, Freq))) +
+  geom_point() +
+  theme_grey(20)
+```
+
+```{r}
+
+# boxplot and density and histogram of goal
+proj %>% 
+  ggplot(aes(x=Goal_USD)) + 
+  geom_histogram(aes(y=after_stat(density)))+
+  geom_density() +
+  geom_boxplot(aes(y=-0.5)) +
+  scale_x_log10()
+```
+
+```{r}
+proj <- proj %>% 
+  rename("Top_Category" = 'Top Category')
+# categorical features with target
+# stacked bar chart
+# proj %>% 
+#   ggplot(aes(x = `Facebook Connected`, fill = State))+
+#   geom_bar()  # seems independent
+
+# what categories have more successful rate?
+library(RColorBrewer)
+state_color <- brewer.pal(n = 2, name = 'Paired')[1:2]
+proj %>% 
+  ggplot(aes(x = fct_reorder(Top_Category, -ifelse(State == 'successful', 1,0), mean), fill = State))+
+  scale_fill_manual(values = state_color) +
+  geom_bar(position = 'fill') +
+  labs(title = 'Top Category vs. Rate of success') +
+  xlab('ratio') +
+  ylab('Top Category') +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+# does popular categories have more sucessful rate?
+# proj %>% 
+#   ggplot(aes(x = fct_infreq(Top_Category), fill = State))+
+#   geom_bar(position = 'fill')
+
+
+
+# library(RColorBrewer)
+# brewer.pal(n = 2, name = 'Paired')
+```
+
+```{r, fig.height=8, fig.width=8}
+library(vcd)
+library(RColorBrewer)
+state_color <- brewer.pal(n = 2, name = 'Paired')[1:2]
+# does popular categories have more successful rate?
+mosaic(State~fct_infreq(Top_Category), proj, direction=c('v', 'h'), highlighting_fill = state_color, 
+       main = "Top Category vs. Rate of success",
+       title_margins = 4,
+       labeling_args = list(
+  set_varnames = list(`fct_infreq(Top_Category)` = "Top Categories", State = "State"),
+  rot_labels = c(45, 90),
+  gp_labels = gpar(fontsize = 10),
+  offset_labels = c(1,0),
+  offset_varnames = c(1.5,0)))
+```
+
+Time series
+
+```{r}
+# duration range: 1 day to 2 months
+proj %>% arrange(`Duration in Days`) %>% slice(1, n()) %>% pull(`Duration in Days`)
+# time range: 2013.12~2014.6
+proj %>% arrange(Start) %>% slice(1, n()) %>% pull(Start)
+proj %>% arrange(End) %>% slice(1, n()) %>% pull(End)
+
+# plot by mean days
+proj_st = proj %>% 
+  group_by(Start) %>% 
+  summarise(total_pledge_usd = sum(Pledged_USD),
+            mean_pledge_usd = mean(Pledged_USD),
+            total_goal_usd = sum(Goal_USD),
+            mean_goal_usd = mean(Goal_USD),
+            num_proj = n()
+            )
+
+proj_ed = proj %>% 
+  group_by(End) %>% 
+  summarise(total_pledge_usd = sum(Pledged_USD),
+            mean_pledge_usd = mean(Pledged_USD),
+            total_goal_usd = sum(Goal_USD),
+            mean_goal_usd = mean(Goal_USD),
+            num_proj = n()
+            )
+# proj_mid = proj %>% 
+#   mutate(mid_day = Start + difftime(End, Start, units = "days")/ 2) %>% 
+#   group_by(mid_day) %>% 
+#   summarise(total_pledge_usd = sum(Pledged_USD),
+#             mean_pledge_usd = mean(Pledged_USD),
+#             total_goal_usd = sum(Goal_USD),
+#             mean_goal_usd = mean(Goal_USD),
+#             num_proj = n()
+#             )
+# 
+# proj %>% pull(Start) %>% month()
+
+# proj %>% filter(Goal_USD > 6e4)
+
+library(fpp3)
+
+
+proj_st = proj_st %>% as_tsibble()
+proj_ed = proj_ed %>% as_tsibble()
+# proj_st
+
+proj_st %>% fill_gaps() %>% gg_season(num_proj, period = 'month')
+
+proj_st %>% filter(total_goal_usd < 1e8) %>% 
+  fill_gaps() %>% gg_season(total_goal_usd, period = 'month')
+proj_st %>% filter(total_goal_usd < 1e8) %>% 
+   fill_gaps() %>% gg_season(mean_goal_usd, period = 'month')
+
+
+proj_st %>% fill_gaps() %>% gg_season(log(mean_goal_usd), period = 'month')
+proj_ed %>% fill_gaps() %>% gg_season(log(mean_pledge_usd), period = 'month')
+proj_ed %>% fill_gaps() %>% gg_season(num_proj, period = 'month')
+# no pattern
+
+proj_st %>% autoplot(num_proj)
+proj_st %>% autoplot(log(mean_goal_usd))
+proj_ed %>% autoplot()
+
+proj_st%>%
+  ggplot(aes(x = mday(Start))) +
+  geom_line(aes(y = num_proj, group = month(Start)))
+
+proj %>% filter(
+  Start == (proj_st %>% filter(total_goal_usd > 1e8) %>% pull(Start))
+) %>% slice_max(order_by = Goal_USD)
+
+# 
+# +
+#   # geom_line(aes(y = mean_pledge_usd)) +
+# 
+# +
+#   geom_smooth(method = "loess", span = 0.1, se = FALSE)
+# 
+# 
+# +   
+#   facet_grid(.~month(mid_day, label = TRUE))
+```
+
+```{r}
+
+  # "# Videos"                      ,
+  # "# Images"                      ,
+  # "# Words (Description)"         ,
+  # "# Words (Risks and Challenges)",
+  # "# FAQs"     
+# #words description
+proj %>% 
+  ggplot(aes(x = State, y = `# Words (Description)`)) +
+  geom_boxplot() +
+  scale_y_log10()
+
+# #words r&c
+proj %>% 
+  filter(`# Words (Risks and Challenges)` >= 500) %>% 
+  ggplot(aes(x = State, y = `# Words (Risks and Challenges)`)) +
+  geom_boxplot() +
+  scale_y_log10()
+
+# faq
+proj %>% 
+  ggplot(aes(x = State, y = `# FAQs`)) +
+  geom_boxplot() +
+  scale_y_log10()
+# faq
+proj %>% 
+  ggplot(aes(x = State, y = `# Videos`)) +
+  geom_boxplot() +
+  scale_y_log10()
+# faq
+proj %>% 
+  ggplot(aes(x = State, y = `# Images`)) +
+  geom_boxplot() +
+  scale_y_log10()
+
+# update
+proj %>% 
+  ggplot(aes(x = State, y = `Updates`)) +
+  geom_boxplot() +
+  scale_y_log10()
+
+# Comments
+proj %>% 
+  ggplot(aes(x = State, y = `Comments`)) +
+  geom_boxplot() +
+  scale_y_log10()
+
+# Comments
+proj %>% 
+  ggplot(aes(x = State, y = `Rewards`)) +
+  geom_boxplot() +
+  scale_y_log10()
+# Comments
+proj %>% 
+  ggplot(aes(x = State, y = `Duration in Days`)) +
+  geom_boxplot()
+
++
+  scale_y_log10()
+# Comments
+proj %>% 
+  ggplot(aes(x = State, y = `Facebook Shares`)) +
+  geom_boxplot() +
+  scale_y_log10()
+
+proj %>% 
+  ggplot(aes(x = State, y = ))
+```
+
+```{r, fig.height=6, fig.width=6}
+library(egg)
+p_up <- proj %>% 
+  ggplot(aes(x = State, y = `Updates`)) +
+  geom_boxplot() +
+  scale_y_log10()+ labs(title = "State vs. Crowfunding Data")
+
+p_comm <- proj %>% 
+  ggplot(aes(x = State, y = `Comments`)) +
+  geom_boxplot() +
+  scale_y_log10()
+
+
+p_rew <- proj %>% 
+  ggplot(aes(x = State, y = `Rewards`)) +
+  geom_boxplot() +
+  scale_y_log10()
+
+
+p_fcs <- proj %>% 
+  ggplot(aes(x = State, y = `Facebook Shares`)) +
+  geom_boxplot() +
+  scale_y_log10()
+
+egg::ggarrange(p_up, p_comm, p_rew, p_fcs)
+
+```
+
+```{r}
+p_wrc <- proj %>% 
+  ggplot(aes(x = State, y = `# Words (Risks and Challenges)`)) +
+  geom_boxplot() +
+  scale_y_log10() +labs(title = "For all projects")
+
+p_wrc500 <- proj %>% 
+  filter(`# Words (Risks and Challenges)` >= 500) %>% 
+  ggplot(aes(x = State, y = `# Words (Risks and Challenges)`)) +
+  geom_boxplot() +
+  scale_y_log10() +
+  labs(title = "For # Words (R&C) >= 500")
+
+egg::ggarrange(p_wrc, p_wrc500, ncol = 2)
+```
+
+```{r, fig.height=15}
+# clean_subsample_s = proj %>% filter(State == 'successful') %>% sample_n(50, replace = FALSE)
+# clean_subsample_f = proj %>% filter(State == 'failed') %>% sample_n(50, replace = FALSE)
+# clean_subsample = rbind(clean_subsample_s, clean_subsample_f)
+clean_subsample = proj %>% sample_n(100, repalce = FALSE)
+clean_subsample %>% select(all_of(c(num_feat, "State"))) %>% 
+  ggparcoord(columns = c(5:6, 1, 13:15), alphaLines = 0.5, scale = "center")
+```
+
+```{r}
+library(parcoords)
+select_num_feat = c(
+  "Updates",
+  "Comments",
+  "Rewards",
+  "Pledged",
+  "Backers",
+  "Facebook Shares"               ,
+  "# Videos"                      ,
+  "# Images"                      ,
+  "# Words (Description)"         ,
+  "# Words (Risks and Challenges)",
+  "# FAQs"      ,
+  "State"
+)
+
+proj %>% select(all_of(select_num_feat)) %>% 
+  parcoords(rownames = FALSE,
+          brushMode = "1D-axes",
+          color = list(colorBy = "State",
+                       colorScale = "scaleOrdinal",
+                       colorScheme = "schemeCategory10"),
+          alpha = 0.5,
+          reorderable = T,
+          withD3 = TRUE,
+          width = 770,
+          height = 600)
+```
+
+```{r}
+num_feat = c(
+  "Updates",
+  "Comments",
+  "Rewards",
+  "Goal"   ,
+  "Pledged",
+  "Backers",
+  "Duration in Days",    
+  "Facebook Friends"              ,
+  "Facebook Shares"               ,
+  "Creator - # Projects Created"  ,
+  "Creator - # Projects Backed"   ,
+  "# Videos"                      ,
+  "# Images"                      ,
+  "# Words (Description)"         ,
+  "# Words (Risks and Challenges)",
+  "# FAQs"      
+)
+proj %>% 
+  ggplot(aes(x = Goal_USD, y = Backers)) +
+  geom_point(alpha = 0.5)  +
+  scale_x_log10() +
+  facet_grid(.~State) +
+  labs(title = 'Goal amount vs. # Backers') +
+  xlab('Goal Amount (USD)') +
+  ylab('# Backers')
+```
+
+```{r}
+# proj <- proj %>% rename(Top_Category=Top_category)
+categories<- proj %>% group_by(Top_Category, State) %>% count() %>% 
+  mutate(Category=Top_Category, Granularity="Top Category") %>% 
+  ungroup() %>% pivot_wider(names_from=State, values_from=n, values_fill=0) %>% 
+  mutate(success_rate=successful/(successful+failed)) %>% 
+  select(Top_Category, Category, success_rate, Granularity) %>% arrange(desc(success_rate))
+
+# categories2<-proj %>% group_by(Top_Category, Category, State) %>% count() %>% 
+#   mutate(Granularity="Category") %>%
+#   ungroup() %>% pivot_wider(names_from=State, values_from=n, values_fill=0) %>% 
+#   mutate(success_rate=successful/(successful+failed)) %>% 
+#   select(Top_Category, Category, success_rate, Granularity) %>% arrange(Top_Category, desc(success_rate))
+
+# categories_d3<-rbind(categories, categories2) %>% rename(category=Category)
+write_csv(categories, "categories_d3.csv")
+```
+
+```{r}
+read_csv("https://raw.githubusercontent.com/1819398633/crowd_funding/master/categories_d3.csv", show_col_types = FALSE)
+```

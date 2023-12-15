@@ -33,28 +33,10 @@ suppressPackageStartupMessages({
 }
   
 )
-
-```
-
-```{r}
-# library(forcats)
-# library(tidyverse)
-# library(dplyr)
-# library(ggplot2)
-# library(readr)
-# library(stringr)
-# library(redav)
-# library(ggplot2)
-# library(egg)
-# library(vcd)
-# library(RColorBrewer)
-# library(plotly)
-# library(GGally)
-# library(scales)
-
 proj <- read_csv("https://raw.githubusercontent.com/1819398633/crowd_funding/master/18k_Projects_clean.csv", show_col_types = FALSE)
 
 state_color <- hue_pal()(2)
+
 ```
 
 ## Overview of the Project Goal Amount and Amount of Money Pledged
@@ -126,7 +108,7 @@ mosaic(State~fct_infreq(Top_Category), proj, direction=c('v', 'h'), highlighting
        labeling_args = list(
   set_varnames = list(`fct_infreq(Top_Category)` = "Top Categories", State = "State"),
   rot_labels = c(45, 90),
-  gp_labels = gpar(fontsize = 10),
+  gp_labels = gpar(fontsize = 8),
   offset_labels = c(1,0),
   offset_varnames = c(1.5,0)))
 

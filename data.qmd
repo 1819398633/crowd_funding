@@ -24,7 +24,8 @@ Since we are given the locations the projects, we can plot the projects on a wor
 
 ## Data Pre-processing
 
-```{r, echo=FALSE}
+```{r}
+suppressPackageStartupMessages({
 library(tidyverse)
 library(dplyr)
 library(ggplot2)
@@ -32,7 +33,7 @@ library(readr)
 library(stringr)
 library(redav)
 library(ggplot2)
-options(warn = -1)
+options(warn = -1)})
 ```
 
 First, we read the raw data.
