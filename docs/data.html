@@ -179,6 +179,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#description" id="toc-description" class="nav-link active" data-scroll-target="#description"><span class="header-section-number">2.1</span> Description</a></li>
   <li><a href="#data-pre-processing" id="toc-data-pre-processing" class="nav-link" data-scroll-target="#data-pre-processing"><span class="header-section-number">2.2</span> Data Pre-processing</a></li>
   <li><a href="#missing-value-analysis" id="toc-missing-value-analysis" class="nav-link" data-scroll-target="#missing-value-analysis"><span class="header-section-number">2.3</span> Missing value analysis</a></li>
+  <li><a href="#store-clean-data" id="toc-store-clean-data" class="nav-link" data-scroll-target="#store-clean-data"><span class="header-section-number">2.4</span> Store clean data</a></li>
   </ul>
 <div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/1819398633/crowd_funding.git/edit/main/data.qmd" class="toc-action">Edit this page</a></p><p><a href="https://github.com/1819398633/crowd_funding.git/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
     </div>
@@ -203,13 +204,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 <p>Our main data source will be six months of data about Kickstarter crowdfunding projects, from December 15, 2013 to to June 15, 2014, collected using kickspy by Professor Chandan Reddy. The dataset is available on this website: http://dmkd.cs.vt.edu/projects/crowdfunding/dataset.htm, and we will be using the 18k_Projects.csv file. The dataset was used in research papers, including https://creddy.net/papers/WSDM16b.pdf. Projects that were canceled, suspended, or had less than one backer and $100 as pledged amount were excluded from this dataset. Thus, we will not be able to gain any insights on these types of crowdfunding projects. Data was also collected from social media sites by Professor Reddy’s research group, where it was available. Here, the main issue is that there may not be data values available for some of the projects, if they were not shared on social media.</p>
-<p>Another issue that we found with the data was that there were some duplicate rows, resulting in multiple instances of a project ID, even though the IDs were supposed to be distinct. It seems like this was a mistake made while collecting the data. There were 74 project IDs that were repeated, so as a data preprocessing step, we will have to go through and remove these duplicate values. Some of these duplicate rows also have slightly different values for certain columns, so we will have to manually determine which of the values is correct.</p>
+<p>Another issue that we found with the data was that there were some duplicate rows, resulting in multiple instances of a project ID, even though the IDs were supposed to be distinct. It seems like this was a mistake made while collecting the data. There were 74 project IDs that were repeated, so as a data preprocessing step, we will have to go through and remove these duplicate values. Some of these duplicate rows also have slightly different values for certain columns, so out of the duplicated rows, we decided to keep the one with the lowest number of missing values.</p>
 <p>The data is formatted as a csv file separated with tabs, and it has not been updated since the initial collection. We will download the data locally and read it using R. There are 18,142 rows and 35 columns in the dataset. It contains information about the Kickstarter projects, including the ID, name, URL, state (failed or successful), currency in which the donations were raised, the category of the projects, the creator of the project, location, the number of updates, the number of comments on the page, rewards (collected by the backer if the project is successful), the goal (or the target amount of money that the creator hopes to raise), the amount of money pledged, the number of backers, the start and end dates of the project, the duration of the project in days, columns to indicate whether the project has a video, and the longitude and latitude coordinates. Moreover, there is information about the creator, including their social media and bio pages.</p>
 <section id="description" class="level2" data-number="2.1">
 <h2 data-number="2.1" class="anchored" data-anchor-id="description"><span class="header-section-number">2.1</span> Description</h2>
-<p>To understand the different types of projects that are on Kickstarter, we could look at the projects by category, as well as the most common key words in the names of the projects. Whether the project is successful or not is indicated by the State column, so we can facet based on State to determine if there are distinguishing characteristics specific to the projects that are successful. The dataset also provides information about the creator, such as the number of Facebook friends that they have if they’ve connected their Facebook to their page, and the number of Facebook shares for their project. The dataset also contains information about the creator pages, including the number of other projects that the creator has created, as well as the amount of content of these pages (including the number of images and videos, the number of words in the Description and Risks and Challenges sections, and the number of FAQs). These are all numerical quantities, for which we could create data visualizations.</p>
+<p>To understand the different types of projects that are on Kickstarter, we could look at the projects by category. Whether the project is successful or not is indicated by the State column, so we can facet based on State to determine if there are distinguishing characteristics specific to the projects that are successful. The dataset also provides information about the creator, such as the number of Facebook friends that they have if they’ve connected their Facebook to their page, and the number of Facebook shares for their project. For the categorical variables, such as whether or not the project page is connected to Facebook and whether or not the project page has a video, we can create mosaic plots to see if these features are related to the average success rate of the project.</p>
+<p>The dataset also contains information about the creator pages, including the number of other projects that the creator has created, as well as the amount of content of these pages (including the number of images and videos, the number of words in the Description and Risks and Challenges sections, and the number of FAQs). We are also given information about how many backers there were for each project, as well as the number of Facebook shares throughout the course of the project and the total duration of the project. These are all numerical quantities, for which we could create data visualizations. In particular, we could look at how these numerical variables are related to the final amount pledged for each of these projects.</p>
 <p>We can also use the Goal column to visualize the target amount of donations for the projects, as well as the Pledged column to display the amount of money that the backers promise to give (if the project is successful). Since different currencies are used for the projects, we would have to standardize to USD.</p>
-<p>Since we are given the start and end times of the projects, we can plot the number of active projects at a given time. This can be further broken down into the successful and failed projects, to determine if the dates during which the project ran had an effect on whether the project was successful. To get the average amount of money that the project backers promise to donate to a project, we can divide the amount pledged by the number of backers. Faceting on whether the project was successful or not will give us more insight on how the distribution of the average amount backers donated to a project may differ.</p>
+<p>Since we are given the locations the projects, we can plot the projects on a world map. This can give us an idea of where in the world these projects are located, and it allows us to see the regions where Kickstarter is more commonly used.</p>
 </section>
 <section id="data-pre-processing" class="level2" data-number="2.2">
 <h2 data-number="2.2" class="anchored" data-anchor-id="data-pre-processing"><span class="header-section-number">2.2</span> Data Pre-processing</h2>
@@ -227,7 +229,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors</code></pre>
 </div>
 </div>
-<p>read raw data</p>
+<p>First, we read the raw data.</p>
 <div class="cell">
 <details>
 <summary>Code</summary>
@@ -235,7 +237,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>raw_df <span class="ot">&lt;-</span> raw_df <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="fu">c</span>(<span class="sc">-</span>Url, <span class="sc">-</span><span class="st">`</span><span class="at">Start Timestamp (UTC)</span><span class="st">`</span>, <span class="sc">-</span><span class="st">`</span><span class="at">End Timestamp (UTC)</span><span class="st">`</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
-<p>There are 5 duplicated rows and 64 duplicated ID.</p>
+<p>We observe that there are 5 duplicated rows and 64 duplicated IDs.</p>
 <div class="cell">
 <details>
 <summary>Code</summary>
@@ -274,7 +276,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a><span class="co"># nrow(raw_df) - nrow(clean_df)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
-<p>Check feature data types: the types are already converted.</p>
+<p>Check feature data types and ensure that the types are already converted.</p>
 <div class="cell">
 <details>
 <summary>Code</summary>
@@ -283,7 +285,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co"># too long, output not included here</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
-<p>Transform currency features into the same unit (USD) and apply log transform</p>
+<p>Transform currency features into the same unit (USD) and apply log transformations.</p>
 <div class="cell">
 <details>
 <summary>Code</summary>
@@ -314,7 +316,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">Longitude=</span><span class="fu">ifelse</span>(<span class="fu">is.na</span>(Longitude), longitude, Longitude)) <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="sc">-</span>latitude, <span class="sc">-</span>longitude)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
-<p>Check for outliers and abnormalities: We checked the goal amount. There is a project with extreme high goal value, 0 updates and only 1 dollar pledged. Thus we consider it as an outlier and remove it.</p>
+<p>Check for outliers and abnormalities: We checked the goal amount. There is a project with extreme high goal value of 100 million USD, 0 updates and only 1 dollar pledged. This is 10 times larger than the second largest Goal value and clearly an outlier, so we removed it.</p>
 <div class="cell">
 <details>
 <summary>Code</summary>
@@ -357,7 +359,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>clean_df <span class="ot">=</span> clean_df <span class="sc">%&gt;%</span> <span class="fu">filter</span>(Goal_USD <span class="sc">&lt;</span> <span class="fl">1e7</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
-<p>Select necessary columns and store the clean data for plotting.</p>
+<p>Rename columns, select necessary columns, and store the clean data for plotting.</p>
 <div class="cell">
 <details>
 <summary>Code</summary>
@@ -374,8 +376,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="missing-value-analysis" class="level2" data-number="2.3">
 <h2 data-number="2.3" class="anchored" data-anchor-id="missing-value-analysis"><span class="header-section-number">2.3</span> Missing value analysis</h2>
-<p>For analysis purpose, we use data generated by the code above with ancillary features.</p>
-<p>Here shows the number of missing values in the columns.</p>
+<p>For the purpose of the analysis, we use data generated by the code above with ancillary features.</p>
+<p>The table below shows the number of missing values in the columns.</p>
 <div class="cell">
 <details>
 <summary>Code</summary>
@@ -465,6 +467,9 @@ Adding another scale for y, which will replace the existing scale.</code></pre>
 <p><img src="data_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
+</section>
+<section id="store-clean-data" class="level2" data-number="2.4">
+<h2 data-number="2.4" class="anchored" data-anchor-id="store-clean-data"><span class="header-section-number">2.4</span> Store clean data</h2>
 
 
 </section>

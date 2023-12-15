@@ -8,11 +8,11 @@ TODO (non-tech summary on top findings)
 
 ## Import clean data
 
-```{r, echo=FALSE}
-#| echo: false
+```{r}
+
 knitr::opts_chunk$set(warning = FALSE, message = FALSE)
-suppressWarnings({
-  
+suppressPackageStartupMessages({
+
   library(forcats)
   library(tidyverse)
   library(dplyr)
@@ -31,6 +31,24 @@ suppressWarnings({
 }
   
 )
+
+```
+
+```{r}
+# library(forcats)
+# library(tidyverse)
+# library(dplyr)
+# library(ggplot2)
+# library(readr)
+# library(stringr)
+# library(redav)
+# library(ggplot2)
+# library(egg)
+# library(vcd)
+# library(RColorBrewer)
+# library(plotly)
+# library(GGally)
+# library(scales)
 
 proj <- read_csv("https://raw.githubusercontent.com/1819398633/crowd_funding/master/18k_Projects_clean.csv", show_col_types = FALSE)
 
@@ -149,7 +167,7 @@ Most of the projects appear to be located in the United States, with some projec
 
 ## What numerical features are relevant with the success?
 
-```{r}
+```{r, fig.height=6, fig.width=8}
 #| warning: false
 proj %>% 
   select(State, Backers, `Facebook Shares`, Rewards, log_goal_usd, log_pledged_usd) %>% 
@@ -157,7 +175,7 @@ proj %>%
           columns = 2:6,
           mapping = aes(color=State),
           lower = list(continuous = wrap('points', alpha=0.2))
-          ) + theme_minimal()
+          )
   
 
 ```

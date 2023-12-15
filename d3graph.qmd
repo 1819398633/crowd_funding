@@ -3,26 +3,53 @@
 <style>
   * {
     font-family: sans-serif;
+    .xAxis text {
+		font-size: 10px;
+	  }
+	  .yAxis text {
+		font-size: 10px;
+	  }
+	  .success {
+		fill: #00BFC4;
+	  }
+	  .failed {
+		fill: #F8766D;
+	  }
   }
 </style> 
 
-<div id="plot">
-    <div id="plot" style="padding-left: 30px;">
+<div id="charts" style="padding-left: 30px;">
+  <p id="chart" style="background-color: silver; color: white;">
+    Please select the type of chart that you would like to view:</p>
+
+  <input type="radio" name="chart_type" value="proportions" checked = True>Proportions</input>
+  <input type="radio" name="chart_type" value="count">Total Count</input>
+  </div>
+
+  <div id="orders" style="padding-left: 30px;">
+  <p id="order" style="background-color: silver; color: white;">
+    Order by:</p>
+
+  <input type="radio" name="order" value="success_rate" checked = True>Success Rate</input>
+  <input type="radio" name="order" value="count">Total Count</input>
 </div>
 
-<div style="padding-left: 30px;">
-  <p></p>
-  <p id="color" style="background-color: silver; color: white;">
-     Please select the type of chart that you would like to view:</p>
-  <input type="radio" name="chart_type" value="proportions">Proportions</input>
-    <input type="radio" name="chart_type" value="count">Total Count</input>
+<div id="plot" style="padding-left: 30px;"></div>
 
-  <p id="color" style="background-color: silver; color: white;">
-     Please select the type of chart that you would like to view:</p>
-  <input type="radio" name="order" value="succes_rate">Success Rate</input>
-    <input type="radio" name="order" value="count">Total Count</input>
-
-  </div>
+<div id="explanation" style="padding-left: 30px;">
+  <p>
+      This interactive graph displays the successful and failed projects by category, as a stacked bar chart. The default view is a stacked bar chart of the proportion of successful projects for each category, ordered by the success rate of that category. This view shows that categories for entertainment like dance, theater, music, and comics had the highest proportion of successful projects, while fashion and technology had the least.
+  </p>
+  <p>
+    The viewer can also choose to look at a stacked bar chart of the total counts of each category, ordered by the total count of each category. The most common categories are Film & Video, Music, and Publishing, while the least common categories are Crafts and Journalism. We can see that the top 3 most popular categories are quite different from each other. Nonetheless, some of the common features that they share are art, entertainment, and digital.
+  </p>
+  <p>
+    Next, to see if the success rate is related to the size of the categories, the viewer can choose to look at a stacked bar chart of the total coounts of each category, ordered by the success rate of the category. For the most part, we found that the most common project categories did not have the highest proportion of successful projects. For instance, the total count of projects in Dance and Theater are relatively low, but they have the highest success rates. However, the Music category is the second largest and has the third highest success rate, while the Film & Video category is the largest and has the fifth highest success rate.
+  </p>
+  <p>
+      The viewer can also choose to look at a stacked bar chart of the proportion of successful projects for each category, ordered by total count of projects in each cateogry, if they are interested in seeing how the success rate varies by the size of each category. Once again, we can see that there is not much relationship between the number of projects in a category and the average success rate of projects in that category. Rather, the success rate seems to vary across the project categories. Some of the larger categories, such as Music, have higher average success rate, while some of the smaller categories, like Dance, Theater, and Comics, also have relatively high average success rates.
+    </p>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
 <script src="scripts/myscript.js"></script>

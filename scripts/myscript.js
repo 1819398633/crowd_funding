@@ -1,93 +1,230 @@
-// add your JavaScript/D3 to this file
-// Create svg and initial bars
+	// Create svg and initial bars
 
-const w = 800;
-const h = 600;
-const margin = {top: 25, right: 0, bottom: 25,
-    left: 25};
-const innerWidth = w - margin.left - margin.right;
-const innerHeight = h - margin.top - margin.bottom;
+	const w = 800;
+	const h = 500;
+	const margin = {top: 25, right: 10, bottom: 25,
+		left: 40};
+	const innerWidth = w - margin.left - margin.right;
+	const innerHeight = h - margin.top - margin.bottom;
+	const transitionDuration = 1000;
 
-const bardata = [{category: "Dance", success_rate: 0.711, total: 263},
-               {category: "Theater", success_rate: 0.677, total: 647},
-               {category: "Music", success_rate: 0.630, total: 2724},
-               {category: "Comics", success_rate: 0.595, total: 571},
-               {category: "Film & Video", success_rate: 0.529, total: 3471},
-               {category: "Art", success_rate: 0.528, total: 1361},
-               {category: "Games", success_rate: 0.494, total: 1614},
-               {category: "Design", success_rate: 0.459, total: 1436},
-               {category: "Photography", success_rate: 0.407, total: 538},
-               {category: "Food", success_rate: 0.405, total: 1106},
-               {category: "Journalism", success_rate: 0.403, total: 72},
-               {category: "Publishing", success_rate: 0.396, total: 2043},
-               {category: "Crafts", success_rate: 0.380, total: 221},
-               {category: "Fashion", success_rate: 0.359, total: 1023},
-               {category: "Technology", success_rate: 0.357, total: 983}]
+	const rowConverter = function (d) {
+	return {
+		category: d.Top_Category,
+		success_rate: +d.success_rate,
+		total: +d.total
+		}
+	};
 
-const sortedData = bardata.sort((a, b) => a.total - b.total);
-const xScale = d3.scaleBand()
-    .domain(bardata.map(d => d.category))
-    .range([0, innerWidth])
-    .paddingInner(.1);
+	d3.csv("https://raw.githubusercontent.com/1819398633/crowd_funding/master/categories_d3.csv", rowConverter)
+  		.then(function(bardata) {
 
-const yScale = d3.scaleLinear()
-    .domain([0, 1])
-    .range([innerHeight, 0])
+		// stuff that requires the loaded data
+		console.log(bardata);
 
-const xAxis = d3.axisBottom()
-    .scale(xScale);
+		let xScale = d3.scaleBand()
+			.domain(bardata.map(d => d.category))
+			.range([0, innerWidth])
+			.paddingInner(.1);
 
-const yAxis = d3.axisLeft()
-    .scale(yScale);
+		let yScale = d3.scaleLinear()
+			.domain([0, 1])
+			.range([innerHeight, 0])
 
-// add svg
+		let xAxis = d3.axisBottom()
+			.scale(xScale);
 
-const svg = d3.select("body")
-  .append("svg")
-    .attr("width", w)
-    .attr("height", h);
+		let yAxis = d3.axisLeft()
+			.scale(yScale);
 
-// add background rectangle
+		// add svg
 
-svg.append("rect")
-    .attr("x", 0)
-    .attr("y", 0)
-    .attr("width", w)
-    .attr("height", h)
-    .attr("fill", "aliceblue");
+		const svg = d3.select("body")
+			.select("div#plot")
+			.append("svg")
+			.attr("width", w)
+			.attr("height", h);
 
-// add bars as a group
+		// add background rectangle
 
-const bars = svg.append("g")
-    .attr("id", "plot")
-    .attr("transform", `translate (${margin.left}, ${margin.top})`)
-  .selectAll("rect")
-    .data(bardata);
+		svg.append("rect")
+			.attr("x", 0)
+			.attr("y", 0)
+			.attr("width", w)
+			.attr("height", h)
+			.attr("fill", "aliceblue");
 
-bars.enter().append("rect")
-    .attr("x", d => xScale(d.category))
-    .attr("y", d => yScale(1))
-    .attr("width", xScale.bandwidth())
-    .attr("height", d => innerHeight - yScale(1))
-    .attr("fill", "lightpink");
+		// add bars as a group
 
-bars.enter().append("rect")
-    .attr("x", d => xScale(d.category))
-    .attr("y", d => yScale(d.success_rate))
-    .attr("width", xScale.bandwidth())
-    .attr("height", d => innerHeight - yScale(d.success_rate))
-    .attr("fill", "lightgreen");
+		const bars = svg.append("g")
+			.attr("id", "failed")
+			.attr("transform", `translate (${margin.left}, ${margin.top})`)
+			.selectAll("rect")
+			.data(bardata, d => d.category);
+
+		bars.enter().append("rect")
+			.attr("class", "failed")
+			.attr("x", d => xScale(d.category))
+			.attr("y", d => yScale(1))
+			.attr("width", xScale.bandwidth())
+			.attr("height", d => innerHeight - yScale(1));
+
+		const bars2 = svg.append("g")
+			.attr("id", "success")
+			.attr("transform", `translate (${margin.left}, ${margin.top})`)
+			.selectAll("rect")
+			.data(bardata, d => d.category);
+
+		bars2.enter().append("rect")
+			.attr("class", "success")
+			.attr("x", d => xScale(d.category))
+			.attr("y", d => yScale(d.success_rate))
+			.attr("width", xScale.bandwidth())
+			.attr("height", d => innerHeight - yScale(d.success_rate));
 
 
-// add axes
+		// add axes
 
-svg.append("g")
-    .attr("class", "xAxis")
-    .attr("transform", `translate (${margin.left}, ${h - margin.bottom})`)
-    .call(xAxis);
+		svg.append("g")
+			.attr("class", "xAxis")
+			.attr("transform", `translate (${margin.left}, ${h - margin.bottom})`)
+			.call(xAxis);
 
-svg.append("g")
-    .attr("class", "yAxis")
-    .attr("transform", `translate (${margin.left}, ${margin.top})`)
-    .call(yAxis);
+		svg.append("g")
+			.attr("class", "yAxis")
+			.attr("transform", `translate (${margin.left}, ${margin.top})`)
+			.call(yAxis);
 
+
+		let chart_type = "proportions";
+		let order = "success_rate";
+
+		d3.select("div#charts")
+		.selectAll("input")
+		.on("click", function() { chart_type = d3.select(this).node().value;
+		console.log(chart_type);
+		update_all();
+		});
+
+		d3.select("div#orders")
+		.selectAll("input")
+		.on("click", function() { order = d3.select(this).node().value;
+			update_all();
+		console.log(order);
+		});
+
+
+
+		function update_prop(data) {
+
+			xScale.domain(bardata.map(d => d.category));
+
+			yScale.domain([0, 1]);
+
+			xAxis = d3.axisBottom()
+			.scale(xScale);
+
+			yAxis = d3.axisLeft()
+			.scale(yScale);
+
+			const bars = svg.select("#failed")
+				.selectAll("rect")
+				.data(data, d => d.category);
+
+			bars.transition().duration(transitionDuration).attr("x", d => xScale(d.category))
+			.attr("y", d => yScale(1))
+			.attr("width", xScale.bandwidth())
+			.attr("height", d => innerHeight - yScale(1));
+
+			const bars2 = svg.select("#success")
+				.selectAll("rect")
+				.data(data, d => d.category);
+
+			bars2.transition().duration(transitionDuration).attr("x", d => xScale(d.category))
+			.attr("y", d => yScale(d.success_rate))
+			.attr("width", xScale.bandwidth())
+			.attr("height", d => innerHeight - yScale(d.success_rate));
+
+			svg.select(".xAxis")
+				.transition()
+				.duration(transitionDuration)
+				.call(xAxis);
+
+			svg.select(".yAxis")
+				.transition()
+				.duration(transitionDuration)
+				.call(yAxis);
+
+		}
+
+		function update_count(data) {
+
+			xScale.domain(bardata.map(d => d.category))
+
+			yScale.domain([0, d3.max(bardata, d => d.total)]);
+
+			xAxis = d3.axisBottom()
+			.scale(xScale);
+
+			yAxis = d3.axisLeft()
+			.scale(yScale);
+
+			const bars = svg.select("#failed")
+				.selectAll("rect")
+				.data(data, d => d.category);
+
+			bars.transition().duration(transitionDuration).attr("x", d => xScale(d.category))
+			.attr("y", d => yScale(d.total))
+			.attr("width", xScale.bandwidth())
+			.attr("height", d => innerHeight - yScale(d.total));
+
+			const bars2 = svg.select("#success")
+				.selectAll("rect")
+				.data(data, d => d.category);
+
+			bars2.transition().duration(transitionDuration).attr("x", d => xScale(d.category))
+			.attr("y", d => yScale(d.success_rate*d.total))
+			.attr("width", xScale.bandwidth())
+			.attr("height", d => innerHeight - yScale(d.success_rate*d.total));
+
+			svg.select(".xAxis")
+				.transition()
+				.duration(transitionDuration)
+				.call(xAxis);
+
+			svg.select(".yAxis")
+				.transition()
+				.duration(transitionDuration)
+				.call(yAxis);
+
+		}
+
+		function update_all(){
+			if (order == "success_rate"){
+				var sortedData = bardata.sort((a, b) => b.success_rate - a.success_rate);
+				console.log('sort by success rate');
+			} else{
+				var sortedData = bardata.sort((a, b) => b.total - a.total);
+				console.log('sort by total');
+			}
+			if (chart_type=="proportions"){
+				update_prop(bardata);
+				console.log('updated by proportions');
+			} else{
+				update_count(bardata);
+				console.log('updated by count');
+			}
+		};
+
+	})
+	.catch(function(error) {
+
+		// error handling
+		d3.select("body")
+			.select("div#plot")
+			.append("p")
+			.attr('x', w/2)
+			.attr('y', h/2)
+			.text("Error loading data !");
+
+	});
