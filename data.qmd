@@ -8,11 +8,13 @@ The data is formatted as a csv file separated with tabs, and it has not been upd
 
 ## Description
 
-To understand the different types of projects that are on Kickstarter, we could look at the projects by category. Whether the project is successful or not is indicated by the State column, so we can facet based on State to determine if there are distinguishing characteristics specific to the projects that are successful. The dataset also provides information about the creator, such as the number of Facebook friends that they have if they've connected their Facebook to their page, and the number of Facebook shares for their project. The dataset also contains information about the creator pages, including the number of other projects that the creator has created, as well as the amount of content of these pages (including the number of images and videos, the number of words in the Description and Risks and Challenges sections, and the number of FAQs). These are all numerical quantities, for which we could create data visualizations. In particular, we could look at how these numerical variables are related to the final amount pledged for each of these projects. 
+To understand the different types of projects that are on Kickstarter, we could look at the projects by category. Whether the project is successful or not is indicated by the State column, so we can facet based on State to determine if there are distinguishing characteristics specific to the projects that are successful. The dataset also provides information about the creator, such as the number of Facebook friends that they have if they've connected their Facebook to their page, and the number of Facebook shares for their project. For the categorical variables, such as whether or not the project page is connected to Facebook and whether or not the project page has a video, we can create mosaic plots to see if these features are related to the average success rate of the project. 
+
+The dataset also contains information about the creator pages, including the number of other projects that the creator has created, as well as the amount of content of these pages (including the number of images and videos, the number of words in the Description and Risks and Challenges sections, and the number of FAQs). We are also given information about how many backers there were for each project, as well as the number of Facebook shares throughout the course of the project and the total duration of the project. These are all numerical quantities, for which we could create data visualizations. In particular, we could look at how these numerical variables are related to the final amount pledged for each of these projects. 
 
 We can also use the Goal column to visualize the target amount of donations for the projects, as well as the Pledged column to display the amount of money that the backers promise to give (if the project is successful). Since different currencies are used for the projects, we would have to standardize to USD.
 
-Since we are given the start and end times of the projects, we can plot the number of active projects at a given time. This can be further broken down into the successful and failed projects, to determine if the dates during which the project ran had an effect on whether the project was successful. To get the average amount of money that the project backers promise to donate to a project, we can divide the amount pledged by the number of backers. Faceting on whether the project was successful or not will give us more insight on how the distribution of the average amount backers donated to a project may differ.
+Since we are given the locations the projects, we can plot the projects on a world map. This can give us an idea of where in the world these projects are located, and it allows us to see the regions where Kickstarter is more commonly used. 
 
 ## Data Pre-processing
 
@@ -27,14 +29,14 @@ library(ggplot2)
 options(warn = -1)
 ```
 
-read raw data
+First, we read the raw data.
 
 ```{r}
 raw_df <- read_tsv("https://raw.githubusercontent.com/1819398633/crowd_funding/master/18k_Projects.csv", show_col_types = FALSE)
 raw_df <- raw_df %>% select(c(-Url, -`Start Timestamp (UTC)`, -`End Timestamp (UTC)`))
 ```
 
-There are 5 duplicated rows and 64 duplicated ID.
+We observe that there are 5 duplicated rows and 64 duplicated IDs.
 
 ```{r}
 # duplicate rows (5)
@@ -63,7 +65,7 @@ clean_df <- clean_df %>%
 # nrow(raw_df) - nrow(clean_df)
 ```
 
-Check feature data types: the types are already converted.
+Check feature data types and ensure that the types are already converted.
 
 ```{r}
 # glimpse(clean_df) %>% head()
@@ -71,7 +73,7 @@ Check feature data types: the types are already converted.
 # too long, output not included here
 ```
 
-Transform currency features into the same unit (USD) and apply log transform
+Transform currency features into the same unit (USD) and apply log transformations.
 
 ```{r}
 clean_df <- clean_df %>% mutate(Pledged_USD=case_when(Currency=="USD"~Pledged, 
@@ -101,7 +103,7 @@ clean_df <- left_join(clean_df, locations_cleaned, by="Location", multiple="firs
 
 ```
 
-Check for outliers and abnormalities: We checked the goal amount. There is a project with extreme high goal value, 0 updates and only 1 dollar pledged. Thus we consider it as an outlier and remove it.
+Check for outliers and abnormalities: We checked the goal amount. There is a project with extreme high goal value of 100 million USD, 0 updates and only 1 dollar pledged. This is 10 times larger than the second largest Goal value and clearly an outlier, so we removed it.
 
 ```{r}
 # normal
@@ -112,7 +114,7 @@ clean_df %>% slice_max(n=1, order_by = Goal_USD)
 clean_df = clean_df %>% filter(Goal_USD < 1e7)
 ```
 
-Select necessary columns and store the clean data for plotting.
+Rename columns, select necessary columns, and store the clean data for plotting.
 
 ```{r}
 clean_df <- clean_df %>% rename(Top_Category = `Top Category`)
@@ -127,9 +129,9 @@ clean_df <- clean_df %>% rename(Top_Category = `Top Category`)
 
 ## Missing value analysis
 
-For analysis purpose, we use data generated by the code above with ancillary features.
+For the purpose of the analysis, we use data generated by the code above with ancillary features.
 
-Here shows the number of missing values in the columns.
+The table below shows the number of missing values in the columns.
 
 ```{r}
 col_na = colSums(is.na(clean_df)) %>%
