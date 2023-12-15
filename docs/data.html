@@ -203,7 +203,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 </header>
 
-<p>Our main data source will be six months of data about Kickstarter crowdfunding projects, from December 15, 2013 to to June 15, 2014, collected using kickspy by Professor Chandan Reddy. The dataset is available on this website: http://dmkd.cs.vt.edu/projects/crowdfunding/dataset.htm, and we will be using the 18k_Projects.csv file. The dataset was used in research papers, including https://creddy.net/papers/WSDM16b.pdf. Projects that were canceled, suspended, or had less than one backer and $100 as pledged amount were excluded from this dataset. Thus, we will not be able to gain any insights on these types of crowdfunding projects. Data was also collected from social media sites by Professor Reddy’s research group, where it was available. Here, the main issue is that there may not be data values available for some of the projects, if they were not shared on social media.</p>
+<p>Our main data source will be six months of data about Kickstarter crowdfunding projects, from December 15, 2013 to to June 15, 2014, collected using kickspy by Professor Chandan Reddy. The dataset is available on this website<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>: http://dmkd.cs.vt.edu/projects/crowdfunding/dataset.htm, and we will be using the 18k_Projects.csv file. The dataset was used in research papers, including https://creddy.net/papers/WSDM16b.pdf. Projects that were canceled, suspended, or had less than one backer and $100 as pledged amount were excluded from this dataset. Thus, we will not be able to gain any insights on these types of crowdfunding projects. Data was also collected from social media sites by Professor Reddy’s research group, where it was available. Here, the main issue is that there may not be data values available for some of the projects, if they were not shared on social media.</p>
 <p>Another issue that we found with the data was that there were some duplicate rows, resulting in multiple instances of a project ID, even though the IDs were supposed to be distinct. It seems like this was a mistake made while collecting the data. There were 74 project IDs that were repeated, so as a data preprocessing step, we will have to go through and remove these duplicate values. Some of these duplicate rows also have slightly different values for certain columns, so out of the duplicated rows, we decided to keep the one with the lowest number of missing values.</p>
 <p>The data is formatted as a csv file separated with tabs, and it has not been updated since the initial collection. We will download the data locally and read it using R. There are 18,142 rows and 35 columns in the dataset. It contains information about the Kickstarter projects, including the ID, name, URL, state (failed or successful), currency in which the donations were raised, the category of the projects, the creator of the project, location, the number of updates, the number of comments on the page, rewards (collected by the backer if the project is successful), the goal (or the target amount of money that the creator hopes to raise), the amount of money pledged, the number of backers, the start and end dates of the project, the duration of the project in days, columns to indicate whether the project has a video, and the longitude and latitude coordinates. Moreover, there is information about the creator, including their social media and bio pages.</p>
 <section id="description" class="level2" data-number="2.1">
@@ -305,23 +305,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>clean_df <span class="ot">&lt;-</span> clean_df <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">log_pledged_usd=</span><span class="fu">log</span>(Pledged_USD), <span class="at">log_goal_usd=</span><span class="fu">log</span>(Goal_USD)) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
-<p>We noticed that the spacial coordinates were missing for many of the observations. Thus, we gathered the locations where the coordinate values were not null, and we also used ChatGPT and Google to get the coordinates of locations where no coordinates were provided. We compiled this into the location_coordinates.csv file. To get the spacial coordinates of the locations for data visualizations later, we joined this file with our original dataset and filled in the coordinate values, where available.</p>
-<div class="cell">
-<details>
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>locations_cleaned <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"https://raw.githubusercontent.com/1819398633/crowd_funding/master/location_coordinates.csv"</span>) </span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>clean_df <span class="ot">&lt;-</span> <span class="fu">left_join</span>(clean_df, locations_cleaned, <span class="at">by=</span><span class="st">"Location"</span>, <span class="at">multiple=</span><span class="st">"first"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Latitude=</span><span class="fu">ifelse</span>(<span class="fu">is.na</span>(Latitude), latitude, Latitude),</span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">Longitude=</span><span class="fu">ifelse</span>(<span class="fu">is.na</span>(Longitude), longitude, Longitude)) <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="sc">-</span>latitude, <span class="sc">-</span>longitude)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-</div>
 <p>Check for outliers and abnormalities: We checked the goal amount. There is a project with extreme high goal value of 100 million USD, 0 updates and only 1 dollar pledged. This is 10 times larger than the second largest Goal value and clearly an outlier, so we removed it.</p>
 <div class="cell">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># normal</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>clean_df <span class="sc">%&gt;%</span> <span class="fu">slice_min</span>(<span class="at">n=</span><span class="dv">10</span>, <span class="at">order_by =</span> Goal_USD) <span class="sc">%&gt;%</span> <span class="fu">pull</span>(Goal_USD)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># normal</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>clean_df <span class="sc">%&gt;%</span> <span class="fu">slice_min</span>(<span class="at">n=</span><span class="dv">10</span>, <span class="at">order_by =</span> Goal_USD) <span class="sc">%&gt;%</span> <span class="fu">pull</span>(Goal_USD)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code> [1]  66  74  74  74  74  74  99 100 100 100 100 100 100 100 100 100 100 100 100
@@ -330,8 +319,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># outlier exist</span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>clean_df <span class="sc">%&gt;%</span> <span class="fu">slice_max</span>(<span class="at">n=</span><span class="dv">10</span>, <span class="at">order_by =</span> Goal_USD) <span class="sc">%&gt;%</span> <span class="fu">pull</span>(Goal_USD)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># outlier exist</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>clean_df <span class="sc">%&gt;%</span> <span class="fu">slice_max</span>(<span class="at">n=</span><span class="dv">10</span>, <span class="at">order_by =</span> Goal_USD) <span class="sc">%&gt;%</span> <span class="fu">pull</span>(Goal_USD)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code> [1] 1.00e+08 8.00e+06 7.00e+06 6.10e+06 6.00e+06 5.00e+06 3.63e+06 3.00e+06
@@ -339,38 +328,31 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>clean_df <span class="sc">%&gt;%</span> <span class="fu">slice_max</span>(<span class="at">n=</span><span class="dv">1</span>, <span class="at">order_by =</span> Goal_USD)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>outlier <span class="ot">=</span> clean_df <span class="sc">%&gt;%</span> <span class="fu">slice_max</span>(<span class="at">n=</span><span class="dv">1</span>, <span class="at">order_by =</span> Goal_USD) <span class="sc">%&gt;%</span> <span class="fu">select</span>(Name, Goal_USD, Pledged_USD, Backers, Updates, Comments)</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>outlier[<span class="dv">1</span>,] <span class="sc">%&gt;%</span> <span class="fu">as.vector</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 1 × 37
-        Id Name  State Currency `Top Category` Category Creator Location Updates
-     &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;    &lt;chr&gt;          &lt;chr&gt;    &lt;chr&gt;   &lt;chr&gt;      &lt;dbl&gt;
-1   1.81e9 The … fail… USD      Film &amp; Video   Shorts   Chris … Denver         0
-# ℹ 28 more variables: Comments &lt;dbl&gt;, Rewards &lt;dbl&gt;, Goal &lt;dbl&gt;,
-#   Pledged &lt;dbl&gt;, Backers &lt;dbl&gt;, Start &lt;date&gt;, End &lt;date&gt;,
-#   `Duration in Days` &lt;dbl&gt;, `Facebook Connected` &lt;chr&gt;,
-#   `Facebook Friends` &lt;dbl&gt;, `Facebook Shares` &lt;dbl&gt;, `Has Video` &lt;chr&gt;,
-#   Latitude &lt;dbl&gt;, Longitude &lt;dbl&gt;, `Creator Bio` &lt;chr&gt;,
-#   `Creator Website` &lt;chr&gt;, `Creator - # Projects Created` &lt;dbl&gt;,
-#   `Creator - # Projects Backed` &lt;dbl&gt;, `# Videos` &lt;dbl&gt;, `# Images` &lt;dbl&gt;, …</code></pre>
+<pre><code>$Name
+[1] "The Return Of The Bell Witch Movie"
+
+$Goal_USD
+[1] 1e+08
+
+$Pledged_USD
+[1] 1
+
+$Backers
+[1] 1
+
+$Updates
+[1] 0
+
+$Comments
+[1] 0</code></pre>
 </div>
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>clean_df <span class="ot">=</span> clean_df <span class="sc">%&gt;%</span> <span class="fu">filter</span>(Goal_USD <span class="sc">&lt;</span> <span class="fl">1e7</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-</div>
-<p>Rename columns, select necessary columns, and store the clean data for plotting.</p>
-<div class="cell">
-<details>
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>clean_df <span class="ot">&lt;-</span> clean_df <span class="sc">%&gt;%</span> <span class="fu">rename</span>(<span class="at">Top_Category =</span> <span class="st">`</span><span class="at">Top Category</span><span class="st">`</span>)</span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="co"># clean_df %&gt;%</span></span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="co">#   select(c(-`Creator Bio`,</span></span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="co">#            -`Creator Website`,</span></span>
-<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="co">#            -na_num,</span></span>
-<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a><span class="co">#            -Pledged,</span></span>
-<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a><span class="co">#            -Goal)) %&gt;%</span></span>
-<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a><span class="co">#   write_csv("18k_Projects_clean.csv")</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>clean_df <span class="ot">=</span> clean_df <span class="sc">%&gt;%</span> <span class="fu">filter</span>(Goal_USD <span class="sc">&lt;</span> <span class="fl">1e7</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 </section>
@@ -381,18 +363,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>col_na <span class="ot">=</span> <span class="fu">colSums</span>(<span class="fu">is.na</span>(clean_df)) <span class="sc">%&gt;%</span></span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sort</span>(<span class="at">decreasing =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>col_na <span class="ot">=</span> col_na[col_na <span class="sc">&gt;</span> <span class="dv">0</span>]</span>
-<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>col_na</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>col_na <span class="ot">=</span> <span class="fu">colSums</span>(<span class="fu">is.na</span>(clean_df)) <span class="sc">%&gt;%</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sort</span>(<span class="at">decreasing =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>col_na <span class="ot">=</span> col_na[col_na <span class="sc">&gt;</span> <span class="dv">0</span>]</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>col_na</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
-<pre><code>               Creator Website               Facebook Friends 
+<pre><code>                      Latitude                      Longitude 
+                          8278                           8278 
+               Creator Website               Facebook Friends 
                           6604                           5837 
-   Creator - # Projects Backed                       Latitude 
+   Creator - # Projects Backed                       # Videos 
                           4239                             85 
-                     Longitude                       # Videos 
-                            85                             85 
 # Words (Risks and Challenges) 
                             85 </code></pre>
 </div>
@@ -402,12 +384,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>clean_df_miss <span class="ot">=</span> clean_df <span class="sc">%&gt;%</span> </span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span> (col_na <span class="sc">%&gt;%</span> <span class="fu">names</span>())</span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(clean_df_miss) <span class="ot">=</span> <span class="fu">c</span>(<span class="st">'Lat.'</span>, <span class="st">'Long.'</span>, <span class="st">'Cre.Web.'</span>, <span class="st">'FB.Con.'</span>, <span class="st">'Cre.numB'</span>, <span class="st">'num.Video'</span>, <span class="st">'num.WoRC'</span>)</span>
-<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>clean_df_miss <span class="sc">%&gt;%</span> </span>
-<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot_missing</span>(<span class="at">percent =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>clean_df_miss <span class="ot">=</span> clean_df <span class="sc">%&gt;%</span> </span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span> (col_na <span class="sc">%&gt;%</span> <span class="fu">names</span>())</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(clean_df_miss) <span class="ot">=</span> <span class="fu">c</span>(<span class="st">'Lat.'</span>, <span class="st">'Long.'</span>, <span class="st">'Cre.Web.'</span>, <span class="st">'FB.Con.'</span>, <span class="st">'Cre.numB'</span>, <span class="st">'num.Video'</span>, <span class="st">'num.WoRC'</span>)</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>clean_df_miss <span class="sc">%&gt;%</span> </span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot_missing</span>(<span class="at">percent =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stderr">
 <pre><code>Scale for y is already present.
@@ -416,7 +398,7 @@ Scale for y is already present.
 Adding another scale for y, which will replace the existing scale.</code></pre>
 </div>
 <div class="cell-output-display">
-<p><img src="data_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid" width="768"></p>
+<p><img src="data_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid" width="768"></p>
 </div>
 </div>
 <p>For features, there are around 50% of the (<code>Latitude</code>, <code>Longitude</code>) pairs missing. <code>Creator Website</code> and <code>Facebook Connected</code> are also common missing values.</p>
@@ -428,24 +410,24 @@ Adding another scale for y, which will replace the existing scale.</code></pre>
 <div class="cell">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># get start time range</span></span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>clean_df <span class="sc">%&gt;%</span> </span>
-<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="st">`</span><span class="at"># Videos</span><span class="st">`</span> <span class="sc">%&gt;%</span> <span class="fu">is.na</span>()) <span class="sc">%&gt;%</span> </span>
-<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(Start, End) <span class="sc">%&gt;%</span> </span>
-<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(Start) <span class="sc">%&gt;%</span> </span>
-<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice</span>(<span class="fu">c</span>(<span class="dv">1</span>,<span class="fu">n</span>())) <span class="sc">%&gt;%</span> <span class="fu">pull</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># get start time range</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>clean_df <span class="sc">%&gt;%</span> </span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="st">`</span><span class="at"># Videos</span><span class="st">`</span> <span class="sc">%&gt;%</span> <span class="fu">is.na</span>()) <span class="sc">%&gt;%</span> </span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(Start, End) <span class="sc">%&gt;%</span> </span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(Start) <span class="sc">%&gt;%</span> </span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice</span>(<span class="fu">c</span>(<span class="dv">1</span>,<span class="fu">n</span>())) <span class="sc">%&gt;%</span> <span class="fu">pull</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] "2014-01-17" "2014-03-07"</code></pre>
 </div>
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># get end time range</span></span>
-<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>clean_df <span class="sc">%&gt;%</span> </span>
-<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="st">`</span><span class="at"># Videos</span><span class="st">`</span> <span class="sc">%&gt;%</span> <span class="fu">is.na</span>()) <span class="sc">%&gt;%</span> </span>
-<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(Start, End) <span class="sc">%&gt;%</span> </span>
-<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(End) <span class="sc">%&gt;%</span> </span>
-<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice</span>(<span class="fu">c</span>(<span class="dv">1</span>,<span class="fu">n</span>())) <span class="sc">%&gt;%</span> <span class="fu">pull</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># get end time range</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>clean_df <span class="sc">%&gt;%</span> </span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="st">`</span><span class="at"># Videos</span><span class="st">`</span> <span class="sc">%&gt;%</span> <span class="fu">is.na</span>()) <span class="sc">%&gt;%</span> </span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(Start, End) <span class="sc">%&gt;%</span> </span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(End) <span class="sc">%&gt;%</span> </span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice</span>(<span class="fu">c</span>(<span class="dv">1</span>,<span class="fu">n</span>())) <span class="sc">%&gt;%</span> <span class="fu">pull</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] "2014-01-14" "2014-03-12"</code></pre>
@@ -456,22 +438,54 @@ Adding another scale for y, which will replace the existing scale.</code></pre>
 <div class="cell">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>clean_df <span class="sc">%&gt;%</span> </span>
-<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">is.na</span>(<span class="st">`</span><span class="at">Facebook Friends</span><span class="st">`</span>))) <span class="sc">+</span></span>
-<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>() <span class="sc">+</span></span>
-<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(.<span class="sc">~</span><span class="st">`</span><span class="at">Facebook Connected</span><span class="st">`</span>) <span class="sc">+</span></span>
-<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="st">'Number of missing values in "Facebook Friends"'</span>) <span class="sc">+</span></span>
-<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="st">"Number of missing value"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>clean_df <span class="sc">%&gt;%</span> </span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">is.na</span>(<span class="st">`</span><span class="at">Facebook Friends</span><span class="st">`</span>))) <span class="sc">+</span></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>() <span class="sc">+</span></span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(.<span class="sc">~</span><span class="st">`</span><span class="at">Facebook Connected</span><span class="st">`</span>) <span class="sc">+</span></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="st">'Number of missing values in "Facebook Friends"'</span>) <span class="sc">+</span></span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="st">"Number of missing value"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="data_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid" width="672"></p>
+<p><img src="data_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 </section>
 <section id="store-clean-data" class="level2" data-number="2.4">
 <h2 data-number="2.4" class="anchored" data-anchor-id="store-clean-data"><span class="header-section-number">2.4</span> Store clean data</h2>
+<p>We noticed that the spacial coordinates were missing for many of the observations. Thus, we gathered the locations where the coordinate values were not null, and we also used ChatGPT and Google to get the coordinates of locations where no coordinates were provided. We compiled this into the location_coordinates.csv file. To get the spacial coordinates of the locations for data visualizations later, we joined this file with our original dataset and filled in the coordinate values, where available.</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>locations_cleaned <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"https://raw.githubusercontent.com/1819398633/crowd_funding/master/location_coordinates.csv"</span>) </span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>clean_df <span class="ot">&lt;-</span> <span class="fu">left_join</span>(clean_df, locations_cleaned, <span class="at">by=</span><span class="st">"Location"</span>, <span class="at">multiple=</span><span class="st">"first"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Latitude=</span><span class="fu">ifelse</span>(<span class="fu">is.na</span>(Latitude), latitude, Latitude),</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">Longitude=</span><span class="fu">ifelse</span>(<span class="fu">is.na</span>(Longitude), longitude, Longitude)) <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="sc">-</span>latitude, <span class="sc">-</span>longitude)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>We rename columns, select necessary columns, and store the clean data for plotting.</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>clean_df <span class="ot">&lt;-</span> clean_df <span class="sc">%&gt;%</span> <span class="fu">rename</span>(<span class="at">Top_Category =</span> <span class="st">`</span><span class="at">Top Category</span><span class="st">`</span>)</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a><span class="co"># clean_df %&gt;%</span></span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a><span class="co">#   select(c(-`Creator Bio`,</span></span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a><span class="co">#            -`Creator Website`,</span></span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a><span class="co">#            -na_num,</span></span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a><span class="co">#            -Pledged,</span></span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a><span class="co">#            -Goal)) %&gt;%</span></span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a><span class="co">#   write_csv("18k_Projects_clean.csv")</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
 
 
+</section>
+<section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes">
+<hr>
+<ol>
+<li id="fn1"><p>http://dmkd.cs.vt.edu/projects/crowdfunding/dataset.htm<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
 </section>
 
 </main> <!-- /main -->

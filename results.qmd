@@ -172,12 +172,13 @@ Most of the projects appear to be located in the United States, with some projec
 ```{r, fig.height=6, fig.width=8}
 #| warning: false
 proj %>% 
-  select(State, Backers, `Facebook Shares`, Rewards, log_goal_usd, log_pledged_usd) %>% 
+  select(State, log_goal_usd, Rewards, `Facebook Shares`,  Backers, log_pledged_usd) %>% 
   ggpairs(title="Scatterplot Matrix", 
           columns = 2:6,
           mapping = aes(color=State),
           lower = list(continuous = wrap('points', alpha=0.2))
           )
+  
   
 
 ```
@@ -224,14 +225,15 @@ To compare the various numerical values gathered on the project pages for each p
 p_wrc <- proj %>% 
   ggplot(aes(x = State, y = `# Words (Risks and Challenges)`, fill = State)) +
   geom_boxplot(alpha = 0.5, show.legend = FALSE) +
+  geom_hline(aes(yintercept = 500), color = 'blue')+
   scale_y_log10() +labs(title = "All projects")
 
 p_wrc500 <- proj %>% 
-  filter(`# Words (Risks and Challenges)` >= 500) %>% 
-  ggplot(aes(x = State, y = `# Words (Risks and Challenges)`, fill = State)) +
-  geom_boxplot(alpha = 0.5, show.legend = FALSE) +
-  scale_y_log10() +
-  labs(title = "# Words (R&C) more than 500")
+  filter(`# Words (Risks and Challenges)` > 500) %>% 
+  ggplot(aes(x = State, fill = State)) +
+  geom_bar(show.legend = FALSE) +
+  # scale_y_log10() +
+  labs(title = "# Words (R&C)  > 500")
 
 egg::ggarrange(p_wrc, p_wrc500, ncol = 2)
 ```

@@ -1,6 +1,6 @@
 # Data
 
-Our main data source will be six months of data about Kickstarter crowdfunding projects, from December 15, 2013 to to June 15, 2014, collected using kickspy by Professor Chandan Reddy. The dataset is available on this website: http://dmkd.cs.vt.edu/projects/crowdfunding/dataset.htm, and we will be using the 18k_Projects.csv file. The dataset was used in research papers, including https://creddy.net/papers/WSDM16b.pdf. Projects that were canceled, suspended, or had less than one backer and \$100 as pledged amount were excluded from this dataset. Thus, we will not be able to gain any insights on these types of crowdfunding projects. Data was also collected from social media sites by Professor Reddy's research group, where it was available. Here, the main issue is that there may not be data values available for some of the projects, if they were not shared on social media.
+Our main data source will be six months of data about Kickstarter crowdfunding projects, from December 15, 2013 to to June 15, 2014, collected using kickspy by Professor Chandan Reddy. The dataset is available on this website[^1]: http://dmkd.cs.vt.edu/projects/crowdfunding/dataset.htm, and we will be using the 18k_Projects.csv file. The dataset was used in research papers, including https://creddy.net/papers/WSDM16b.pdf. Projects that were canceled, suspended, or had less than one backer and \$100 as pledged amount were excluded from this dataset. Thus, we will not be able to gain any insights on these types of crowdfunding projects. Data was also collected from social media sites by Professor Reddy's research group, where it was available. Here, the main issue is that there may not be data values available for some of the projects, if they were not shared on social media.
 
 Another issue that we found with the data was that there were some duplicate rows, resulting in multiple instances of a project ID, even though the IDs were supposed to be distinct. It seems like this was a mistake made while collecting the data. There were 74 project IDs that were repeated, so as a data preprocessing step, we will have to go through and remove these duplicate values. Some of these duplicate rows also have slightly different values for certain columns, so out of the duplicated rows, we decided to keep the one with the lowest number of missing values.
 
@@ -205,3 +205,5 @@ clean_df <- clean_df %>% rename(Top_Category = `Top Category`)
 #            -Goal)) %>%
 #   write_csv("18k_Projects_clean.csv")
 ```
+
+[^1]: http://dmkd.cs.vt.edu/projects/crowdfunding/dataset.htm
